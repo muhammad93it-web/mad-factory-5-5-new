@@ -12,6 +12,8 @@ import { QuickAddParty } from "@/components/quick-add-party";
 import { SearchableSelect } from "@/components/searchable-select";
 import { AutoTextarea } from "@/components/auto-textarea";
 import { PinConfirmModal } from "@/components/pin-confirm-modal";
+import { StatementOfAccountModal } from "@/components/statement-of-account-modal";
+import { BookOpen } from "lucide-react";
 
 type InvoiceItem = {
   materialId: number | null;
@@ -40,6 +42,7 @@ export default function PurchasesNew() {
   const queryClient = useQueryClient();
 
   const [supplierId, setSupplierId] = useState("");
+  const [stmtOpen, setStmtOpen] = useState(false);
   const [supplierMobile, setSupplierMobile] = useState("");
   const [supplierAddress, setSupplierAddress] = useState("");
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split("T")[0]);
@@ -178,6 +181,17 @@ export default function PurchasesNew() {
                   />
                 </div>
                 <QuickAddParty kind="supplier" onCreated={(id) => setSupplierId(String(id))} />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStmtOpen(true)}
+                  disabled={!supplierId}
+                  className="gap-1 bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200 text-xs font-bold"
+                  title="کەشف حساب"
+                >
+                  <BookOpen className="h-3.5 w-3.5" />
+                  کەشف حساب
+                </Button>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -372,6 +386,13 @@ export default function PurchasesNew() {
           if (pendingDeleteIdx != null) removeItem(pendingDeleteIdx);
           setPendingDeleteIdx(null);
         }}
+      />
+
+      <StatementOfAccountModal
+        open={stmtOpen}
+        onClose={() => setStmtOpen(false)}
+        kind="supplier"
+        entityId={supplierId ? Number(supplierId) : null}
       />
     </div>
   );

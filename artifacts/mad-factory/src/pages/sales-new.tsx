@@ -7,6 +7,8 @@ import { SearchableSelect } from "@/components/searchable-select";
 import { AutoTextarea } from "@/components/auto-textarea";
 import { PinConfirmModal } from "@/components/pin-confirm-modal";
 import { CustomerLedgerSummary } from "@/components/customer-ledger-summary";
+import { StatementOfAccountModal } from "@/components/statement-of-account-modal";
+import { BookOpen } from "lucide-react";
 import {
   useCreateSalesInvoice,
   useListCustomers,
@@ -138,6 +140,9 @@ export default function SalesNew() {
 
   // Pretty delete confirmation for material rows
   const [pendingDeleteIdx, setPendingDeleteIdx] = useState<number | null>(null);
+
+  // Statement of Account modal
+  const [stmtOpen, setStmtOpen] = useState(false);
 
   const { data: customers } = useListCustomers({}, { query: { queryKey: getListCustomersQueryKey() } });
   // Sales screen — only show items configured as sellable (sell or both)
@@ -435,23 +440,37 @@ export default function SalesNew() {
           {/* Row 3 — searchable customer + previous invoice quick-pick */}
           <div className="grid grid-cols-12 gap-2">
             <FieldRow label="اسم/کڕیار" className="col-span-12 lg:col-span-7">
-              <SearchableSelect
-                value={customerId}
-                onChange={setCustomerId}
-                disabled={editLocked}
-                placeholder="گەڕان بە ناو / کۆد / ژ.وەسڵ..."
-                buttonClassName="text-sm"
-                options={(filteredCustomers as Array<{ id: number; name: string }>).map((c) => {
-                  const code = String(c.id).padStart(3, "0");
-                  const invs = (allInvoices ?? []).filter((i: { customerId: number; invoiceNumber?: string }) => i.customerId === c.id).map((i: { invoiceNumber?: string }) => i.invoiceNumber ?? "").join(" ");
-                  return {
-                    value: String(c.id),
-                    label: c.name,
-                    sub: code,
-                    haystack: `${c.name} ${code} ${invs}`,
-                  };
-                })}
-              />
+              <div className="flex items-stretch h-full w-full">
+                <div className="flex-1">
+                  <SearchableSelect
+                    value={customerId}
+                    onChange={setCustomerId}
+                    disabled={editLocked}
+                    placeholder="گەڕان بە ناو / کۆد / ژ.وەسڵ..."
+                    buttonClassName="text-sm"
+                    options={(filteredCustomers as Array<{ id: number; name: string }>).map((c) => {
+                      const code = String(c.id).padStart(3, "0");
+                      const invs = (allInvoices ?? []).filter((i: { customerId: number; invoiceNumber?: string }) => i.customerId === c.id).map((i: { invoiceNumber?: string }) => i.invoiceNumber ?? "").join(" ");
+                      return {
+                        value: String(c.id),
+                        label: c.name,
+                        sub: code,
+                        haystack: `${c.name} ${code} ${invs}`,
+                      };
+                    })}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStmtOpen(true)}
+                  disabled={!customerId}
+                  title="کەشف حساب"
+                  className="px-3 border-r border-slate-300 bg-orange-50 hover:bg-orange-100 text-orange-700 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 whitespace-nowrap"
+                >
+                  <BookOpen className="h-3.5 w-3.5" />
+                  کەشف حساب
+                </button>
+              </div>
             </FieldRow>
             <FieldRow label="گەڕان بەپێی ژ.وەسڵ" labelWidth="w-32" className="col-span-12 lg:col-span-5">
               <div className="flex h-full">
@@ -889,6 +908,14 @@ export default function SalesNew() {
           </Button>
         </div>
       </div>
+
+      {/* Statement of Account modal */}
+      <StatementOfAccountModal
+        open={stmtOpen}
+        onClose={() => setStmtOpen(false)}
+        kind="customer"
+        entityId={customerId ? Number(customerId) : null}
+      />
 
       {/* PIN-protected row deletion */}
       <PinConfirmModal
