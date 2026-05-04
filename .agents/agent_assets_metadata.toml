@@ -6,3 +6,9 @@ id = "cD7mX2hfh2he5g6DVl5JE"
 uri = "file://artifacts/mad-factory/public/mad-factory-project.zip"
 type = "unspecified"
 title = "پرۆژەی کارگەی خشتی ماد — کۆدی سەرچاوە"
+
+[[outputs]]
+id = "0FbDHKmWUOge6ezFO6foW"
+uri = "file://MarketSystem_Final.zip"
+type = "unspecified"
+title = "MarketSystem_Final.zip — Mad Factory ERP (full source, 6 MB)"
