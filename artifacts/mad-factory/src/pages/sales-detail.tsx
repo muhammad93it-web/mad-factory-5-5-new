@@ -514,18 +514,29 @@ export default function SalesDetail() {
 
         {/* Items table */}
         <div className="p-2">
-          <table className="w-full text-sm border-collapse">
+          <table className="w-full text-sm border-collapse table-fixed">
+            <colgroup>
+              <col style={{ width: "4%" }} />
+              <col style={{ width: "32%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "10%" }} />
+              <col style={{ width: "11%" }} />
+              <col style={{ width: "8%" }} />
+              <col style={{ width: "12%" }} />
+              <col style={{ width: "13%" }} />
+              {editing && <col style={{ width: "5%" }} className="print:hidden" />}
+            </colgroup>
             <thead>
               <tr className="bg-emerald-100 text-slate-800 text-xs">
-                <th className="border border-slate-300 px-2 py-2 w-10">ژ</th>
-                <th className="border border-slate-300 px-2 py-2">ناوی ماددە</th>
-                <th className="border border-slate-300 px-2 py-2 w-24">ژمارەی پالیت</th>
-                <th className="border border-slate-300 px-2 py-2 w-24">لە پالیت</th>
-                <th className="border border-slate-300 px-2 py-2 w-28">کۆی خشت</th>
-                <th className="border border-slate-300 px-2 py-2 w-20">یەکە</th>
-                <th className="border border-slate-300 px-2 py-2 w-28">سعر (د.ع)</th>
-                <th className="border border-slate-300 px-2 py-2 w-32">کۆی گشتی (د.ع)</th>
-                {editing && <th className="border border-slate-300 px-2 py-2 w-12 print:hidden">×</th>}
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">ژ</th>
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">ناوی ماددە</th>
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">ژمارەی پالیت</th>
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">لە پالیت</th>
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">کۆی خشت</th>
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">یەکە</th>
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">سعر (د.ع)</th>
+                <th className="border border-slate-300 px-2 py-2 whitespace-nowrap">کۆی گشتی (د.ع)</th>
+                {editing && <th className="border border-slate-300 px-2 py-2 print:hidden">×</th>}
               </tr>
             </thead>
             <tbody>
@@ -623,7 +634,7 @@ export default function SalesDetail() {
                   ) : invoice.items.map((it, i) => (
                     <tr key={it.id}>
                       <td className="border border-slate-300 px-2 py-1.5 text-center text-slate-500">{i + 1}</td>
-                      <td className="border border-slate-300 px-2 py-1.5 font-medium">{it.materialName}</td>
+                      <td className="border border-slate-300 px-2 py-1.5 font-medium break-words">{it.materialName}</td>
                       <td className="border border-slate-300 px-2 py-1.5 text-center tabular-nums">{it.palletCount?.toLocaleString() ?? "—"}</td>
                       <td className="border border-slate-300 px-2 py-1.5 text-center tabular-nums">{it.bricksPerPallet?.toLocaleString() ?? "—"}</td>
                       <td className="border border-slate-300 px-2 py-1.5 text-center tabular-nums font-semibold">{(it.totalBricks ?? it.quantity).toLocaleString()}</td>
