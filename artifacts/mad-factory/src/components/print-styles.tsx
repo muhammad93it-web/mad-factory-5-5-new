@@ -2,10 +2,14 @@ export function PrintStyles() {
   return (
     <style>{`
       @media print {
-        @page { margin: 1.2cm; size: A4; }
-        body { background: white !important; }
+        /* margin: 0 on @page tells the browser there is no room for its
+           default header/footer (URL, page title, page number, date), so it
+           omits them across Chrome/Edge/Firefox/Safari. We re-add the
+           printable margin via internal padding on .print-area. */
+        @page { margin: 0; size: A4; }
+        html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+        .print-area { box-shadow: none !important; border: none !important; padding: 1.2cm !important; }
         .print\\:hidden { display: none !important; }
-        .print-area { box-shadow: none !important; border: none !important; }
         .no-print { display: none !important; }
 
         /* Stop long unbroken text in notes from blowing up the layout. */
