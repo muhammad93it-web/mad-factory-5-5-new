@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { useLocation } from "wouter";
+import { Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatMoney, formatDate } from "@/lib/format";
 import {
@@ -37,9 +39,11 @@ type Row = {
   paymentAmount: number;
   discount: number;
   oldBalance: number;
+  editHref: string | null;
 };
 
 export function StatementOfAccountModal({ open, onClose, kind, entityId }: Props) {
+  const [, navigate] = useLocation();
   const idNum = entityId ?? 0;
   const enabled = open && !!entityId;
 
@@ -141,6 +145,7 @@ export function StatementOfAccountModal({ open, onClose, kind, entityId }: Props
           paymentAmount: Number(inv.paidAmount ?? 0),
           discount: Number(inv.discount ?? 0),
           oldBalance: 0,
+          editHref: `/sales/${inv.id}`,
         });
       });
       (custPayments ?? []).forEach((p) => {
@@ -154,6 +159,7 @@ export function StatementOfAccountModal({ open, onClose, kind, entityId }: Props
           paymentAmount: Number(p.amount ?? 0),
           discount: 0,
           oldBalance: 0,
+          editHref: `/customer-payments`,
         });
       });
     } else {
@@ -172,6 +178,7 @@ export function StatementOfAccountModal({ open, onClose, kind, entityId }: Props
           paymentAmount: Number(inv.paidAmountIqd ?? inv.paidAmount ?? 0),
           discount: discountIqd,
           oldBalance: 0,
+          editHref: `/purchases/${inv.id}`,
         });
       });
       (supPayments ?? []).forEach((p) => {
@@ -185,6 +192,7 @@ export function StatementOfAccountModal({ open, onClose, kind, entityId }: Props
           paymentAmount: Number(p.amountIqd ?? p.amount ?? 0),
           discount: 0,
           oldBalance: 0,
+          editHref: `/supplier-payments`,
         });
       });
     }
@@ -243,39 +251,52 @@ export function StatementOfAccountModal({ open, onClose, kind, entityId }: Props
               <table className="w-full border-collapse text-[12px]">
                 <thead className="bg-slate-100 sticky top-0 z-10">
                   <tr className="text-slate-700">
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%]">ژ.وەسڵ</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[16%]">ناو</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%]">مۆبایل</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%]">جۆری وەسڵ</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%]">بەروار</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[11%]">بڕی وەسڵ</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[11%]">پارەدان</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%]">داشکاندن</th>
-                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[12%]">قەرزی کۆن</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[9%] text-right">ژ.وەسڵ</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[14%] text-right">ناو</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%] text-right">مۆبایل</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[9%] text-right">جۆری وەسڵ</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[9%] text-right">بەروار</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%] text-right">بڕی وەسڵ</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[10%] text-right">پارەدان</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[9%] text-right">داشکاندن</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[11%] text-right">قەرزی کۆن</th>
+                    <th className="border-b border-slate-300 px-2 py-2 font-bold w-[7%] text-center">دەستکاری</th>
                   </tr>
                 </thead>
                 <tbody>
                   {!enabled && (
-                    <tr><td colSpan={9} className="text-center text-slate-500 px-3 py-10">— کەسێک هەڵبژێرە —</td></tr>
+                    <tr><td colSpan={10} className="text-center text-slate-500 px-3 py-10">— کەسێک هەڵبژێرە —</td></tr>
                   )}
                   {enabled && rows.length === 0 && (
-                    <tr><td colSpan={9} className="text-center text-slate-500 px-3 py-10">هیچ تۆمارێک نییە</td></tr>
+                    <tr><td colSpan={10} className="text-center text-slate-500 px-3 py-10">هیچ تۆمارێک نییە</td></tr>
                   )}
                   {rows.map((r, i) => (
                     <tr key={i} className="hover:bg-slate-50 even:bg-slate-50/40">
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-center font-semibold tabular-nums" dir="ltr">{r.receiptNo}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right font-semibold tabular-nums">{r.receiptNo}</td>
                       <td className="border-b border-slate-200 px-2 py-1.5 text-right">{r.name}</td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-center tabular-nums" dir="ltr">{r.mobile || "—"}</td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-center">
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right tabular-nums">{r.mobile || "—"}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right">
                         <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold ${r.type === "پارەدان" ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"}`}>
                           {r.type}
                         </span>
                       </td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-center tabular-nums" dir="ltr">{formatDate(r.date)}</td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-left tabular-nums" dir="ltr">{r.invoiceAmount ? formatMoney(r.invoiceAmount) : "0"}</td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-left tabular-nums text-emerald-700 font-semibold" dir="ltr">{r.paymentAmount ? formatMoney(r.paymentAmount) : "0"}</td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-left tabular-nums text-amber-700" dir="ltr">{r.discount ? formatMoney(r.discount) : "0"}</td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-left tabular-nums" dir="ltr">{formatMoney(r.oldBalance)}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right tabular-nums">{formatDate(r.date)}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right tabular-nums">{r.invoiceAmount ? formatMoney(r.invoiceAmount) : "0"}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right tabular-nums text-emerald-700 font-semibold">{r.paymentAmount ? formatMoney(r.paymentAmount) : "0"}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right tabular-nums text-amber-700">{r.discount ? formatMoney(r.discount) : "0"}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-right tabular-nums">{formatMoney(r.oldBalance)}</td>
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-center">
+                        {r.editHref ? (
+                          <button
+                            type="button"
+                            onClick={() => { onClose(); navigate(r.editHref!); }}
+                            title="دەستکاری"
+                            className="inline-flex items-center justify-center h-7 w-7 rounded border border-slate-300 bg-white hover:bg-blue-50 hover:border-blue-400 text-blue-700 transition-colors"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        ) : null}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
