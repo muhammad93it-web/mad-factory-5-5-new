@@ -1,0 +1,340 @@
+I want you to build a complete offline-first factory management system for a brick/tile factory called "Mad Factory" / "کارگەی خشتی ماد".
+
+Very important: do not build a generic ERP. Build the system exactly as a specialized factory accounting and operations system, based on an existing Kurdish desktop-style workflow.
+
+## Core goal
+Convert my current UI preview into a real working system with database, forms, reports, calculations, and downloadable source code.
+
+## Output requirements
+- Build a real working application, not just a UI mockup.
+- The project must be downloadable as full source code.
+- The system must use a real database and real CRUD operations.
+- The system must be portable and easy to run after download.
+- Avoid unnecessary complex dependencies.
+- Make the code clean, organized, and production-minded.
+
+## Preferred architecture
+Build it as a full-stack web app with these priorities:
+- Frontend: React
+- Backend: Node.js + Express
+- Database: SQLite as the first local/offline database
+- ORM/query layer: choose a simple, stable approach
+- Styling: modern clean dashboard UI
+- Language direction: RTL
+- Main UI language: Kurdish Sorani
+
+Reason for this architecture:
+I want to test and run the system easily, download it, and later evolve it into online sync if approved.
+
+## Offline-first requirement
+This is critical.
+The system must be designed offline-first.
+That means:
+- The main app must keep working even when internet is unavailable.
+- Local database should be SQLite.
+- CRUD operations should work locally.
+- The architecture should be prepared for future sync to online server when internet becomes available.
+- For now, build the system in a way that works locally first, but structure the code so sync can be added later.
+
+## Future sync readiness
+Do not fully implement cloud sync now unless necessary, but prepare for it.
+Design the code so these concepts are possible later:
+- local database ID + server sync ID
+- created_at, updated_at
+- sync_status
+- deleted_at for soft delete
+- conflict-ready records
+- audit-friendly structure
+
+## Important business understanding
+This system is not only for sales.
+It is a full factory management and accounting system.
+The app must include these business areas:
+
+1. Sales
+2. Customer payments
+3. Customer old debt / opening balance
+4. Customer list
+5. Daily sales reports
+6. Customer account statement
+7. Purchasing in IQD
+8. Supplier payments
+9. Supplier old debt / opening balance
+10. Supplier account statement
+11. Purchasing in USD
+12. Daily exchange rate
+13. Materials / items / cost tracking
+14. Employees / HR
+15. Payroll
+16. Expenses
+17. Other income
+18. Profit / loss calculations
+19. Shareholders / shares
+20. Shareholder withdrawals and payouts
+21. General cashbox / financial dashboard
+22. Monthly financial closing report
+23. Alerts / overdue notices
+24. Backup / export support
+
+## Very important business rules
+Implement these rules carefully:
+
+### Sales
+- Sales invoice must support customer info, date, driver, vehicle, notes.
+- Invoice items must support item/material, quantity, price, total.
+- Must track both pallet count and brick/tile count where relevant.
+- Must calculate received amount, remaining debt, discount, invoice total.
+
+### Customer payments
+- A separate screen/form to register customer payments.
+- Payment must reduce that customer's debt.
+- Customer account statement must show invoices, payments, debt movement.
+
+### Old debt
+- Must support opening balances for customers and suppliers.
+
+### Purchasing
+- Purchasing workflow must be similar to sales, but reversed financially.
+- Purchase invoice must support supplier, items/materials, quantity, price, total, paid amount, remaining debt.
+
+### USD purchasing
+- Some purchases happen in USD.
+- The factory base accounting is in IQD.
+- When purchase/payment is in USD, the system must use the daily exchange rate.
+- It must convert USD impact into IQD for cashbox/accounting effect.
+
+### Exchange rate
+- Create a module for daily USD exchange rate.
+- Store date + rate.
+- Make purchase/payment calculations use the selected daily rate when needed.
+- The current USD exchange rate must always be visible in the top area/header of the system.
+- The user must be able to manually edit/change the USD exchange rate whenever needed.
+- The user must also be able to set or update the exchange rate together with its date.
+- The top header display should show the latest active rate clearly, using Kurdish UI text and English numerals.
+
+### Materials
+- Create a materials/items module.
+- Each material should support purchase price, optional profit margin, and sale price if needed.
+- Even if the factory mainly sells bricks, this module is important for purchase and cost tracking.
+
+### Employees / HR
+- Each employee must have a unique code.
+- Support name, role, phone(s), address, guarantor/reference info, and attachment/file if possible.
+- Do not hard delete employees when they leave.
+- Use active/inactive status.
+
+### Payroll
+- Payroll must support employee work records and payment records.
+- Show total due, paid amount, remaining amount.
+- Support monthly report, yearly report, individual employee report, and payroll list.
+
+### Expenses and other income
+- Must have categorized expense records.
+- Must have categorized non-sales income records.
+- These records must affect final financial reporting.
+
+### Cashbox / general financial dashboard
+- Create a clear central financial dashboard.
+- The dashboard must combine effects from:
+  - sales receipts
+  - customer debt collection
+  - purchases
+  - supplier payments
+  - payroll
+  - expenses
+  - other income
+  - shareholder payouts
+- The result should show current cash-on-hand clearly.
+
+### Profit / loss
+- Must support period-based profit calculation.
+- Profit/loss should consider sales, expenses, payroll, and other financial movement.
+- Create a monthly financial closing report.
+
+### Shareholders / shares
+- This is very important.
+- The factory has a share-based ownership model.
+- Do not hardcode shares in a rigid way.
+- Build a real Shareholders module.
+- I must be able to:
+  - add a new share/shareholder
+  - edit existing shares/shareholders
+  - record shareholder withdrawals/payouts
+  - calculate share-based profit/loss distribution
+- Make the design flexible, because the share setup may need editing.
+
+### Alerts
+- Add alert/report areas for overdue debts or important pending balances.
+
+## Data integrity rules
+This is critical.
+- Avoid dangerous hard delete patterns in business records.
+- Prefer soft delete or inactive status where appropriate.
+- Preserve accounting history.
+- Do not break relationships between invoices, payments, payroll, expenses, and reports.
+
+## UI and design direction
+Use the UI direction from my current preview.
+I do not want a generic SaaS admin panel.
+I want a specialized factory dashboard inspired by the existing system but cleaner and more modern.
+
+## Language and number rules
+This is mandatory.
+- The entire visible system UI must be in Kurdish Sorani.
+- Use Kurdish labels, Kurdish form text, Kurdish buttons, Kurdish navigation, Kurdish validation messages, and Kurdish report titles.
+- Do not leave mixed English UI text except where technically unavoidable.
+- Numbers must be displayed using English numerals only (0-9), not Arabic/Persian digits.
+- Dates, invoice numbers, phone numbers, quantities, prices, balances, report totals, and all numeric values must use English numerals.
+- Keep RTL layout everywhere.
+
+### Design requirements
+- Full Kurdish Sorani UI
+- English numerals only for all numbers
+- RTL layout
+- Use NRT font or closest Kurdish-friendly font
+- Keep the same spirit of the current grid-based module dashboard
+- Buttons should be visible, compact, and not oversized
+- No unnecessary debug text
+- No generic landing page look
+- Main dashboard should feel like a real operations system
+- Keep the module-group style like the preview
+- Preserve the idea of grouped colored sections and module buttons
+- Modernize it without losing the original business feeling
+
+### Existing visual direction to keep
+- A clear top header/title for Mad Factory
+- Version badge style
+- A visible top-level USD exchange rate display that is always present
+- Grid dashboard with grouped module blocks
+- Footer area with backup/exit style actions
+- Clean modern colors, but still practical and enterprise-like
+
+## Main dashboard modules to display
+Organize the home/dashboard screen with grouped sections similar to this structure:
+- Sales
+- Daily sales / reports
+- Purchase 1
+- Purchase 2
+- Materials
+- Other sections
+
+Inside them, expose the actual modules such as:
+- Sales
+- Customer payment
+- Old customer debt
+- Customer reports
+- Customer list
+- Daily sales
+- Sales by date
+- Customer account statement
+- Profit
+- Alerts
+- Purchase in IQD
+- Supplier payment
+- Old supplier debt
+- Supplier reports
+- Supplier list
+- Daily purchases
+- Purchases by date
+- Supplier account statement
+- Purchase in USD
+- Dollar rate
+- Materials
+- Payroll
+- Manager/admin roles if needed later
+- Editor/user permissions placeholder if you structure permissions
+- Cashbox
+- Expenses
+- Income
+- Shareholder deposit/withdrawal
+- Shareholder management
+
+## Database design expectation
+Design a proper relational database.
+At minimum, think in terms of tables like:
+- customers
+- suppliers
+- materials
+- sales_invoices
+- sales_invoice_items
+- customer_payments
+- customer_opening_balances
+- purchase_invoices
+- purchase_invoice_items
+- supplier_payments
+- supplier_opening_balances
+- exchange_rates
+- employees
+- payroll_entries
+- expenses
+- incomes
+- cashbox_transactions
+- shareholders
+- shareholder_transactions
+- profit_periods
+- monthly_financial_reports
+- alerts
+- attachments
+- app_settings
+
+You may improve these names/relations if needed, but keep the business logic intact.
+
+## Reports to include
+Create real report screens, not fake placeholders.
+At minimum include:
+- customer account statement
+- supplier account statement
+- daily sales report
+- sales by date report
+- daily purchases report
+- purchases by date report
+- payroll report
+- employee individual report
+- monthly financial report
+- profit/loss report
+- overdue balances report
+- shareholder payout report
+- cashbox summary
+
+## Download / backup requirement
+I want to be able to download the project.
+Also include data portability features if possible:
+- database file should be accessible/exportable
+- create backup/export option
+- if possible include JSON/CSV export for key reports
+
+## Implementation quality rules
+- Do not leave the project as fake mock data only.
+- Seed data is okay for demo, but the full CRUD must be real.
+- Use proper form validation.
+- Use reusable components.
+- Keep code modular.
+- Keep naming clear.
+- Write a README with setup and run instructions.
+- Include comments only where helpful, not noisy.
+
+## What I want you to generate now
+Please generate:
+1. the full project structure
+2. the database schema
+3. backend API routes
+4. frontend pages/components
+5. real working forms and reports
+6. a working dashboard home page matching the existing preview spirit
+7. sample data only as optional seed, not as a fake-only system
+8. README for running locally and downloading
+
+## Important warnings
+- Do not simplify this into a small POS.
+- Do not ignore the shareholder logic.
+- Do not ignore payroll.
+- Do not ignore offline-first structure.
+- Do not replace the Kurdish business workflow with generic English-only UI.
+- Do not use Arabic/Persian digits in the visible UI; use English numerals only.
+- Do not build only the UI without the database logic.
+- Do not hard-delete critical records by default.
+
+## Final expectation
+I want a real first version of the Mad Factory system that starts from the existing dashboard preview and becomes a functional system with database-backed modules, ready to run locally, easy to download, and structured for future online sync.
+
+Before coding, first summarize your implementation plan, database schema plan, and page/module structure. Then start building the project in an organized way.

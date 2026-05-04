@@ -1,0 +1,48 @@
+import { Router, type IRouter } from "express";
+import healthRouter from "./health";
+import authRouter from "./auth";
+import backupRouter from "./backup";
+import usersRouter from "./users";
+import customersRouter from "./customers";
+import suppliersRouter from "./suppliers";
+import materialsRouter from "./materials";
+import exchangeRatesRouter from "./exchange-rates";
+import salesRouter from "./sales";
+import customerPaymentsRouter from "./customer-payments";
+import purchasesRouter from "./purchases";
+import supplierPaymentsRouter from "./supplier-payments";
+import employeesRouter from "./employees";
+import payrollRouter from "./payroll";
+import expensesRouter from "./expenses";
+import incomesRouter from "./incomes";
+import shareholdersRouter from "./shareholders";
+import cashboxRouter from "./cashbox";
+import closingsRouter from "./closings";
+import alertsRouter from "./alerts";
+import settingsRouter from "./settings";
+
+const router: IRouter = Router();
+
+router.use(healthRouter);
+router.use(authRouter);
+router.use(backupRouter);
+router.use(usersRouter);
+router.use(customersRouter);
+router.use(suppliersRouter);
+router.use(materialsRouter);
+router.use(exchangeRatesRouter);
+router.use(salesRouter);
+router.use(customerPaymentsRouter);
+router.use(purchasesRouter);
+router.use(supplierPaymentsRouter);
+router.use(employeesRouter);
+router.use(payrollRouter);
+router.use(expensesRouter);
+router.use(incomesRouter);
+router.use(shareholdersRouter);
+router.use(cashboxRouter);
+router.use(closingsRouter);
+router.use(alertsRouter);
+router.use(settingsRouter);
+
+export default router;

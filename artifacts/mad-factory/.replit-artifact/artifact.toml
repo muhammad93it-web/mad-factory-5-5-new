@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Mad Factory - کارگەی خشتی ماد"
+version = "1.0.0"
+id = "artifacts/mad-factory"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19224
+
+[services.development]
+run = "pnpm --filter @workspace/mad-factory run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mad-factory", "run", "build" ]
+publicDir = "artifacts/mad-factory/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19224"
+BASE_PATH = "/"

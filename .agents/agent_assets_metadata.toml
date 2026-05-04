@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "cD7mX2hfh2he5g6DVl5JE"
+uri = "file://artifacts/mad-factory/public/mad-factory-project.zip"
+type = "unspecified"
+title = "پرۆژەی کارگەی خشتی ماد — کۆدی سەرچاوە"

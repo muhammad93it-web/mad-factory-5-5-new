@@ -1,0 +1,191 @@
+I need you to fix a real functional bug in my Mad Factory system, but I also want the interface to move visually toward this reference style:
+https://predeploy-276d9699-madfactory-aggqwen9-nuvviknw45vzopwb.manus.space/
+
+This does NOT mean rebuilding everything from scratch.
+This means:
+1. fix the exchange-rate bug properly
+2. preserve the existing Mad Factory business logic and system structure
+3. align the UI styling more closely with the reference dashboard look and feel
+
+## Core bug that must be fixed first
+On the settings page, there is a form for updating the USD exchange rate.
+Right now, when I enter a new rate and click save:
+- the top header still shows the old rate
+- the new rate does not appear immediately in the header
+- the settings input returns to the old value
+
+Observed example:
+- header showed: 1 USD = 1,480 IQD
+- I changed the rate to 1495
+- I clicked save
+- header still showed 1,480
+- input reset back to 1480
+
+## What I need functionally
+Please find and fix the real root cause.
+Do not do a fake frontend-only patch.
+I need the actual save/update flow to work correctly.
+
+### Required behavior
+When I update the USD exchange rate in settings:
+1. the new rate must be saved to the real database or persistent source of truth
+2. the selected date for that rate must also be saved correctly
+3. the latest active saved rate must become the system rate
+4. the top header must update immediately after save
+5. after refresh, the same new rate must still appear in both settings and header
+6. the settings form must not reset back to stale data
+7. header and settings must always read from the same true latest saved record
+
+## Investigate possible root causes
+Please inspect these areas carefully:
+- backend exchange-rate save route
+- insert/update database logic
+- selector/query for latest active rate
+- frontend mutation success handling
+- query invalidation / refetch after save
+- stale React state in header
+- fallback hardcoded header value
+- settings form being repopulated from old cached data
+- mismatch between saved date and saved rate
+
+## Architecture expectation for this fix
+Please centralize the exchange-rate data flow.
+Use a single source of truth.
+After saving a new rate, make sure the relevant query/state refreshes immediately.
+The header must display real persisted data, not a default or stale placeholder.
+
+## Very important visual requirement
+While fixing the bug, I want the interface styling to move much closer to the reference site and image.
+But do this carefully, without breaking the current app structure or existing pages.
+This is not just a loose style alignment task.
+It should be a near-match in dashboard composition, spacing rhythm, grouped structure, and card layout language.
+
+## Use this reference style as the visual direction
+Reference:
+https://predeploy-276d9699-madfactory-aggqwen9-nuvviknw45vzopwb.manus.space/
+
+### What I like in that reference
+- grouped dashboard layout with clearly separated functional sections
+- colorful but controlled module groups
+- elegant and well-matched icons
+- soft rounded cards with balanced shadows
+- strong Kurdish dashboard personality
+- clean spacing and button proportions
+- a premium desktop-like factory control feeling
+- modules that feel organized, not random
+
+### Important style instructions
+Bring my current system visually closer to that reference in these ways:
+- improve icon consistency across modules
+- make module cards/buttons feel more polished and balanced
+- use clearer grouped visual hierarchy
+- refine the top bar/header so it feels more crafted
+- style the exchange-rate display so it feels integrated and important
+- keep the dashboard feeling specialized for factory operations
+- maintain practical usability while improving beauty
+- do NOT use a sidebar layout
+- the main screen should feel like a centered grouped dashboard similar to the reference
+- the main navigation should rely on grouped module cards/buttons, not a left sidebar
+- the visual structure should stay compact, direct, and desktop-like like the reference
+- the module area must use a real grid-based layout, not a loose flex approximation
+- spacing between cards and groups must look even and intentional like the reference image
+- card widths and heights should feel uniform and aligned in rows/columns
+- the dashboard should visually read as a strict grouped grid, not a casual collection of buttons
+
+## What NOT to do
+- do not destroy the current system structure
+- do not remove existing pages or working logic
+- do not convert it into a generic admin template
+- do not use random icon styles that clash with each other
+- do not overcomplicate the UI with unnecessary effects
+- do not make it look less Kurdish or less domain-specific
+- do not use a sidebar-based app shell
+
+## Design translation from the reference
+The reference dashboard should be treated as the direct primary visual model for the main screen.
+I want the main Mad Factory dashboard to stay very close to that same overall composition and feeling.
+This is not about reducing the system to the same number of modules.
+It is about keeping the same dashboard style while expanding it to fit the full Mad Factory system.
+
+So the correct interpretation is:
+- keep the same grouped centered dashboard concept
+- keep the same visual rhythm of grouped colored module cards
+- keep the same compact desktop-like structure
+- keep the same style of strong category headers and module buttons
+- keep the same polished icon/button harmony
+- use an actual grid system between sections and cards so the layout feels structured exactly like the reference
+- preserve the same visual balance of gaps, rows, columns, and grouped blocks
+- add MORE required Mad Factory modules inside that same grouped dashboard system
+- if needed, increase the dashboard depth/rows/sections while preserving the same style language
+- do not simplify the system just because the visual reference shows fewer items
+- do not drift into a different arrangement style than the reference image
+
+## Language and localization requirements
+The entire visible UI must remain in Kurdish Sorani.
+All numbers must remain in English numerals only.
+The whole application must keep RTL layout.
+Do not switch UI labels to English.
+
+## Business/system requirements that must stay intact
+Keep the Mad Factory system as a real operational system, not just UI.
+Preserve and respect the existing intended modules and workflow, including areas like:
+- sales
+- customer payments
+- customer debt/account statement
+- purchases
+- supplier payments
+- materials
+- payroll
+- expenses and income
+- cashbox/fund
+- profit/loss
+- monthly reporting
+- shareholders and profit distribution logic
+- USD exchange rate management
+- invoice/voucher opening from lists
+- exporting invoice/voucher details to Excel
+- printing invoice/voucher details cleanly
+
+## Before coding
+Before you make changes, first explain briefly:
+1. what the real root cause of the exchange-rate bug appears to be
+2. which files/components you will fix
+3. how you will ensure the header updates immediately after save
+4. how you will align the UI with the reference without breaking the current structure
+
+Then implement the changes.
+
+## Invoice/voucher behavior requirement
+Very important: in the invoice/voucher sections, list items should not be dead rows.
+When I click on an invoice/voucher, the full invoice/voucher should open clearly.
+From that opened invoice/voucher view, I must be able to:
+- inspect the full details
+- print it
+- export it to Excel
+
+Please implement this behavior in a clean practical way.
+The opened invoice/voucher should feel like a real document view, not just a tiny modal with limited information.
+
+## Final result I expect
+I want an updated implementation where:
+- exchange-rate saving actually works correctly
+- the latest saved rate appears immediately in the top header
+- the saved value remains correct after refresh
+- header and settings always match
+- the UI is visually very close to the provided dashboard reference
+- there is no sidebar layout
+- the main screen feels like the same grouped centered dashboard from the reference image/site
+- the layout uses a real clear grid between sections and cards
+- card spacing, alignment, and grouped blocks are almost exactly like the reference image
+- the system is NOT limited to the small number of modules shown in the reference
+- all required Mad Factory modules are added within the same grouped dashboard style
+- if more modules are needed, they should be added as extra grouped cards/rows/sections in the same visual language
+- icons are better matched and more elegant
+- grouped dashboard styling feels more polished
+- invoice/voucher items open properly when clicked
+- invoice/voucher views can be printed
+- invoice/voucher views can be exported to Excel
+- the app still remains a real Kurdish factory system, not just a pretty mockup
+
+Do not respond with theory only.
+Inspect the code, identify the root cause, fix it properly, and improve the styling in the direction of the provided reference.

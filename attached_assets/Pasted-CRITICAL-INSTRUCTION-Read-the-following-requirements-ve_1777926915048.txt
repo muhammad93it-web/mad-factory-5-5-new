@@ -1,0 +1,43 @@
+CRITICAL INSTRUCTION: Read the following requirements very carefully. You MUST implement EVERY SINGLE POINT listed below without skipping or ignoring any step. Take your time to execute them completely.
+
+Please update the Market Management System according to these exact specifications:
+
+1. Form UI Alignment & Restructuring:
+
+Fix and align the top section (header) of the form to be clean and organized.
+
+Width & Positioning: Reduce the width of the "Receipt Number" (ژ.وەصل) and "Buyer Code" (کۆد/کڕیار) fields. Place both of these fields side-by-side on the exact same row.
+
+Relocate: Move the "Guarantor Name" (ناوی کەفیل) field to the row directly below them.
+
+Dynamic Notes Field: Give more space to the "Notes" (تێبینی) field. Change it to an auto-expanding textarea. It must automatically wrap text to the next line and expand its height vertically as more text is typed, without showing scrollbars initially.
+
+2. Strict English Numeral Enforcement (Global System Rule):
+
+Implement a global event listener/formatter across ALL input fields.
+
+If a user types using a Kurdish/Arabic keyboard and inputs Eastern Arabic numerals (٠,١,٢,٣,٤,٥,٦,٧,٨,٩), the system MUST instantly and automatically replace them with Western Arabic numerals (0,1,2,3,4,5,6,7,8,9), even if mixed within text. The user should never have to manually switch keyboard languages just to type numbers.
+
+Force all dates, date pickers, and grids to exclusively display numbers in English format.
+
+3. Separation of Buy/Sell Items:
+
+Completely separate items into 'Buy Items' and 'Sell Items' (use an 'ItemType' column in the DB).
+
+When opening the purchase section, ONLY show items categorized as 'Buy'.
+
+When opening the sales section, ONLY show items categorized as 'Sell'.
+
+4. Searchable Dropdowns (Auto-complete):
+
+Convert the 'Buyer Code' and 'Seller Code' fields into active, searchable dropdowns (auto-complete). Typing in the field must dynamically filter and show matching results in real-time.
+
+5. Secure Deletion Mechanism (Strict Rule):
+
+PROHIBITED: Deleting an entire invoice (receipt) is strictly prohibited. Remove any button that deletes a whole invoice.
+
+Row Deletion Only: Users can only delete specific rows (individual items) inside an invoice grid.
+
+Security Flow: Clicking delete on a row must trigger a "Yes/No" confirmation dialog. If "Yes", immediately prompt for a "PIN Code".
+
+The row deletion must ONLY execute if the entered PIN matches the master PIN set in the system's "Settings".

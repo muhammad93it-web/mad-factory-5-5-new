@@ -1,0 +1,243 @@
+I want you to continue the Mad Factory system and treat this as Prompt 4.
+This prompt is specifically for the reporting layer, treasury understanding, profit/loss calculations, shareholder distribution, and monthly financial closing.
+Do not redesign the dashboard direction.
+Do not destroy the Kurdish grouped dashboard style.
+Do not break the current module structure.
+Build the reporting and financial logic on top of the existing real system.
+
+## Main goal
+Turn the system into a real accounting/reporting tool that can clearly answer these questions:
+- How much did we sell?
+- How much did we buy?
+- How much did we spend?
+- How much cash came in and went out?
+- What is the current treasury/cashbox situation?
+- Did the factory make profit or loss this month?
+- How should profit be distributed among shareholders?
+- What reports should be printable/exportable?
+
+## Important context
+This is not a generic admin dashboard.
+This is a Kurdish Sorani factory/accounting system for Mad Factory.
+The visible UI must remain Kurdish Sorani.
+All numbers must remain English numerals only.
+The system must remain practical and understandable for real daily business use.
+The reporting layer must be based on real stored data, not fake summary numbers.
+
+## Reporting philosophy
+I want the reports to be trustworthy, auditable, and easy to read.
+Each important total should be explainable from underlying records.
+Do not create magical numbers with unclear sources.
+If the system shows a monthly total, it must be possible to trace how that number was reached.
+
+## Build or improve these reporting areas
+
+### 1) Dashboard financial summary
+The top-level dashboard should be able to show useful live summaries when appropriate, such as:
+- today sales
+- today purchase
+- total expenses for period
+- cashbox state
+- current exchange rate
+- outstanding customer balances
+- outstanding supplier balances
+- monthly profit/loss snapshot if appropriate
+
+But keep this practical and visually aligned with the current dashboard style.
+Do not turn it into a crowded analytics page.
+
+### 2) Sales reports
+Create real reporting behavior for sales such as:
+- daily sales report
+- sales by date range
+- sales by customer
+- sales totals by period
+- sales invoice list
+- printable sales documents
+- exportable sales reports to Excel where useful
+
+The report should support filters such as:
+- from date
+- to date
+- customer
+- document number when relevant
+
+### 3) Purchase reports
+Create real reporting behavior for purchases such as:
+- daily purchase report
+- purchase by date range
+- purchase by supplier
+- purchase totals by period
+- supplier invoice list
+- printable purchase documents
+- exportable purchase reports to Excel where useful
+
+The report should support filters such as:
+- from date
+- to date
+- supplier
+- currency type if relevant
+
+### 4) Treasury / cashbox reports
+This is very important.
+I want strong treasury understanding in the system.
+Build real reports for:
+- treasury movement history
+- money in
+- money out
+- expenses
+- revenues
+- opening and closing balance logic if applicable
+- current cashbox understanding
+- transactions linked to source modules when possible
+
+I want to be able to understand where money came from and where it went.
+Do not reduce treasury to one vague number.
+
+### 5) Customer and supplier statements
+These are very important.
+Build reliable account statement reporting for both sides.
+That includes:
+- customer statement / کشف حسابی کڕیار
+- supplier statement / کشف حسابی فرۆشیار
+- chronological movement list
+- document references
+- payment references
+- running balance if possible
+- ability to print statement
+- ability to export statement to Excel if useful
+
+These pages must feel like real accounting statement views, not only simple tables.
+
+### 6) Expense and revenue reporting
+Build clear reporting for:
+- expenses by date range
+- expenses by category if categories exist
+- revenues by date range
+- other income tracking if used
+- totals by month
+- totals by custom range
+
+### 7) Exchange rate reporting
+The exchange rate logic is already important in the system.
+Reporting should support:
+- exchange rate history by date
+- latest active rate
+- visibility of current rate in the top header
+- correct historical retrieval when needed
+
+If reports or documents depend on exchange rate values, make that behavior clear and reliable.
+
+## Profit and loss logic
+This is one of the most important parts.
+I want a real monthly profit/loss process, not a fake static summary.
+Build or improve the logic so the system can calculate monthly financial result from stored data.
+
+The monthly profit/loss should take into account at least these things when they exist in the system:
+- sales totals
+- purchase/cost totals
+- expenses
+- payroll/wages
+- additional revenues
+- treasury-relevant adjustments if part of business logic
+
+The final result should clearly show:
+- total income/revenue side
+- total cost/expense side
+- final net profit or net loss
+
+## Monthly closing process
+I want a clear monthly closing workflow.
+That means the system should support a process like:
+1. choose a month or date range
+2. gather all relevant financial data
+3. calculate totals
+4. calculate profit or loss
+5. store a closing record if needed
+6. use that closing for shareholder distribution and historical reporting
+
+The monthly closing must be traceable.
+Do not make it a mysterious calculation that changes randomly.
+If a closing is saved, it should behave like a real historical record.
+
+## Shareholder logic and profit distribution
+This is also critical.
+The system needs to support shareholders and share-based profit distribution.
+Build or improve these features:
+- shareholder list
+- share count or ownership basis
+- ability to add/edit shareholders when allowed
+- monthly profit distribution based on shares
+- saved distribution records
+- ability to review who got what amount from a given closing period
+
+If the system is based on 100 shares, preserve that logic clearly.
+But do it in a maintainable way.
+Do not hardcode confusing scattered calculations across random frontend files.
+
+The reporting/distribution layer should make it possible to see:
+- total shares
+- shareholder share count
+- per-share profit value for a closing period
+- final allocated amount per shareholder
+- saved history of distributions
+
+## Printing and Excel export
+This is very important.
+For important reporting pages, I want support for:
+- print-friendly layout
+- Excel export where it makes sense
+- readable document/report formatting
+- preserved Kurdish labels in UI and print views
+
+At minimum, this should be considered for:
+- invoices
+- vouchers
+- customer statements
+- supplier statements
+- daily sales report
+- daily purchase report
+- monthly profit/loss summary
+- shareholder distribution report
+- treasury movement report
+
+## Auditability and trust
+I want the system to feel trustworthy.
+That means:
+- major totals should come from real database queries
+- reports should link back to real records when possible
+- statement lines should not be random duplicates
+- monthly closing should not be recalculated in a confusing unstable way after being finalized, unless explicitly reopened
+- saved financial history should remain understandable
+
+## UI expectation for reports
+Even though this prompt focuses on logic, keep the UI quality good.
+Reports should look clean and practical.
+They should fit the Kurdish factory dashboard system.
+Do not create ugly raw debug tables only.
+Make reports readable, printable, and useful.
+
+## What NOT to do
+- do not redesign the whole app visually
+- do not remove the grouped dashboard structure
+- do not use fake static summary numbers
+- do not hide calculation logic in random UI-only code
+- do not make reports impossible to trace
+- do not make monthly profit/loss a hardcoded manual number only
+- do not break exchange-rate behavior
+- do not switch language away from Kurdish Sorani
+- do not replace English numerals with Arabic/Persian numerals
+
+## Final result I expect
+I expect a system where:
+- reports are real and useful
+- treasury movements are understandable
+- customer and supplier statements are reliable
+- expenses and revenues are reportable
+- monthly profit/loss is calculated from real data
+- shareholder distribution works clearly and can be reviewed later
+- print and Excel export are available for important financial pages
+- the whole system feels like a real factory accounting system, not just a UI demo
+
+Inspect the current code and current data model carefully.
+Then build the reporting and financial-closing layer in a clean maintainable way, while preserving the existing Kurdish dashboard direction.

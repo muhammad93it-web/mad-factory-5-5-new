@@ -1,0 +1,289 @@
+I want you to continue the Mad Factory system and treat this as Prompt 3.
+This prompt is focused on database design, schema structure, table relations, keys, stored business meaning, and clean persistence architecture.
+Do not redesign the visual dashboard direction.
+Do not change the Kurdish UI direction.
+Do not break the existing grouped dashboard approach.
+This prompt is specifically for building the correct data foundation under the system.
+
+## Main goal
+Design and implement a clean database-first structure for the Mad Factory system so the application can support:
+- sales
+- purchases
+- exchange rate by date
+- customers
+- suppliers
+- treasury / cashbox
+- expenses and revenues
+- invoices and vouchers
+- workers and payroll
+- shareholders and shares
+- profit/loss reporting
+- monthly financial closing
+- printable/exportable records
+- future offline-first usage and future synchronization readiness
+
+## Important system context
+This is a Kurdish Sorani factory/accounting system.
+The visible UI stays Kurdish Sorani.
+Numbers stay English numerals.
+The business logic is real, not demo-only.
+The system must use real persistent storage.
+Data must remain after refresh.
+The schema must be portable and clean.
+It should be suitable for a downloadable/self-hosted version later.
+
+## Database design priorities
+Build the schema so it is:
+- normalized enough to avoid messy duplication
+- practical enough for accounting/report queries
+- easy to maintain
+- easy to extend later
+- clear in naming
+- clean in foreign key relationships
+- suitable for generating reports and statements
+- suitable for document printing and Excel export
+
+## I want you to do these things
+1. Review the current project structure and current data handling.
+2. Detect which parts are using mock/static/in-memory data.
+3. Replace weak storage structure with a real schema design.
+4. Create or improve database tables and relations cleanly.
+5. Keep the system code aligned with the new schema.
+6. Make forms and lists read/write from the real database.
+7. Keep the implementation practical, not overengineered.
+
+## Core entities that must exist
+I expect a clean relational model around these entities.
+Use good naming and proper primary/foreign keys.
+
+### Factory/system configuration
+Create tables or equivalents for:
+- app_settings
+- exchange_rates
+- backup_logs if needed
+- printer_settings if needed
+- user_roles / permissions if the system supports access control
+
+### Parties / master data
+Create clean master tables for:
+- customers
+- suppliers
+- workers
+- shareholders
+- materials
+- users if authentication or permissions exist
+
+Each master table should support:
+- id
+- name
+- phone if needed
+- notes if needed
+- active/inactive status if appropriate
+- created_at
+- updated_at
+
+## Sales domain
+I need a proper sales structure.
+Design tables so sales are not stored as one messy flat object.
+Use a document-header and document-lines approach if appropriate.
+
+Expected structure should support:
+- sales_invoices (header)
+- sales_invoice_items (lines) if itemized logic exists
+- sales_payments
+- customer_account_entries or customer_ledger_entries
+- sales_returns only if truly needed later
+
+The schema should allow:
+- daily sales listing
+- customer statement / کشف حساب
+- invoice printing
+- invoice reopening
+- filtering by date
+- filtering by customer
+- payment tracking against invoice or customer account
+
+## Purchase domain
+I need a proper purchase structure too.
+Use the same clean relational thinking.
+
+Expected structure should support:
+- purchase_invoices
+- purchase_invoice_items if itemized logic exists
+- supplier_payments
+- supplier_account_entries or supplier_ledger_entries
+- purchase_type or currency type support when needed
+
+The schema must support:
+- purchase by dinar
+- purchase by dollar if relevant
+- supplier statements
+- supplier invoice tracking
+- purchase reports
+- daily purchase listing
+
+## Exchange rate logic
+This is critical.
+Design exchange_rates cleanly so that:
+- each rate can be stored with a date
+- it can have active/inactive status if needed
+- the latest active rate can be retrieved reliably
+- history remains preserved
+- the top header can always show the current valid rate
+- old records still preserve their historical meaning if necessary
+
+If needed, support fields like:
+- id
+- rate_date
+- usd_to_iqd_rate
+- is_active
+- notes
+- created_at
+- updated_at
+
+Think carefully about whether documents should store a snapshot of rate at creation time when business meaning requires historical accuracy.
+
+## Treasury / finance domain
+I want a strong treasury structure.
+Do not store everything in one loose table unless there is a clean ledger design.
+
+Schema should support:
+- cashbox_accounts or treasury_accounts
+- treasury_transactions
+- expense_categories if useful
+- expenses
+- revenues
+- transfers_in_out or treasury_movements
+
+The system should support:
+- cash movement history
+- income/expense reporting
+- treasury balance understanding
+- linking important financial entries back to their source documents when possible
+
+## Ledger/account-statement logic
+Statements are very important.
+Design the database so customer and supplier account statements are reliable.
+You may use one unified ledger strategy or separate ledgers if that is cleaner.
+But the final result must support:
+- customer statement
+- supplier statement
+- balance calculation
+- debit/credit style logic if needed
+- chronological transaction history
+- traceability back to source invoice/payment/movement
+
+If you choose a unified ledger model, make it clean and understandable.
+If you choose separate ledgers, keep them consistent.
+
+## Workers / payroll domain
+Design clean payroll-related entities if payroll is in system scope.
+Possible tables may include:
+- workers
+- payroll_periods
+- payroll_entries
+- wage_payments
+- attendance only if truly required
+
+The schema should support:
+- worker list
+- wage calculation records
+- payment tracking
+- monthly payroll reporting
+
+## Shareholders / shares / profit distribution
+This is very important.
+The system needs logic for shares and monthly profit distribution.
+Design a structure that supports:
+- shareholders
+- share_transactions or shareholder_shares
+- monthly_closings
+- profit_distribution_records
+
+The schema should allow:
+- adding/editing shareholders
+- adjusting shares when allowed
+- storing total share count basis
+- calculating distribution by share count
+- keeping monthly closing history
+- traceability of who received what amount and why
+
+If the system assumes 100 total shares, model that clearly but in a maintainable way.
+Do not hardcode hidden logic without explaining it in the structure.
+
+## Profit/loss and monthly closing
+Design data support for monthly closing and reporting.
+The schema must support calculating:
+- total sales
+- total purchase/costs
+- expenses
+- payroll cost
+- revenues
+- net profit or loss
+- profit distribution by shares
+
+Use either generated reports from transactional tables or summary closing tables, whichever is cleaner.
+But keep it auditable.
+The system must be able to show how a monthly number was reached.
+
+## Invoices and vouchers
+The schema must support real document behavior.
+That means:
+- each invoice/voucher has a stable id
+- a printable representation can be generated from stored data
+- opening a voucher from a list loads the real full document
+- exporting to Excel can use proper structured rows/columns
+- document header and lines should be queryable and stable
+
+## Recommended relation principles
+I want you to follow these principles:
+- every major table should have a clear primary key
+- use foreign keys wherever logical
+- avoid storing repeated names instead of ids, except snapshot fields when historically necessary
+- keep created_at and updated_at where useful
+- preserve historical truth for invoices and rates when needed
+- avoid hidden coupling between unrelated modules
+- avoid one giant generic table if it damages clarity
+
+## Offline-first and portability consideration
+Even if full offline sync is not implemented now, design the schema so it can support it later.
+That means:
+- stable ids
+- predictable timestamps
+- clear entity boundaries
+- possible sync-safe fields later if needed
+- portable data storage structure for downloadable hosting
+
+## What I want in code quality
+- keep schema readable
+- use consistent naming
+- use good relation mapping
+- avoid random quick hacks
+- avoid fake storage after schema creation
+- update existing module pages to use the real schema
+- keep current UI direction intact while improving the data foundation
+
+## What NOT to do
+- do not redesign the dashboard visually
+- do not replace Kurdish language direction
+- do not use only mock arrays or temporary state as final storage
+- do not build a confusing schema with unclear relations
+- do not hide important accounting logic in scattered frontend-only calculations
+- do not create a data model that makes reports impossible later
+- do not ignore invoice/voucher traceability
+- do not ignore exchange-rate history
+
+## Final result I expect
+I expect a result where:
+- the system has a real, clean relational schema
+- the schema supports the real modules already requested
+- relations between customers, suppliers, invoices, payments, treasury, payroll, shareholders, and reports are clear
+- exchange rate is stored correctly by date and current rate can be read reliably
+- the app reads and writes real persistent data
+- future reports, Excel export, printing, and monthly closing become easier because the data model is correct
+- the app becomes a real system on a strong data foundation, not only a pretty interface
+
+Inspect the current codebase carefully.
+Then create or improve the database schema and relations in a clean maintainable way.
+If some existing table or state structure is weak, replace it properly.
+Preserve what is good, but fix what is structurally wrong.

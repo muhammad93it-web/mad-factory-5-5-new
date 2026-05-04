@@ -1,0 +1,214 @@
+I want you to continue improving my Mad Factory system and treat this as Prompt 2.
+This prompt is not for changing the business direction.
+It is for turning the current dashboard-style system into a fully functional real application while preserving the same visual structure I asked for earlier.
+
+## Core instruction
+Keep the dashboard visually very close to the reference image/dashboard I provided.
+Do not redesign it into another style.
+Do not switch to a sidebar layout.
+Do not turn it into a modern SaaS admin panel.
+Keep it as a Kurdish factory desktop-like dashboard with grouped colorful modules.
+
+## Exact visual expectation
+The dashboard must stay very close to the provided image in these ways:
+- same centered dashboard composition
+- same grouped top-level sections
+- same strong colored category blocks
+- same card/button rhythm
+- same near-exact spacing feel between columns and rows
+- same clear grid-based arrangement between all modules
+- same feeling of a compact desktop control panel
+- same Kurdish title/header feeling
+- same practical icon-based module buttons
+
+## Important layout rule
+I do NOT want a loose layout.
+I want a true structured grid.
+Cards and grouped sections must align clearly in rows and columns.
+The spacing between cards must feel even and deliberate.
+The dashboard should look organized exactly like a real grouped factory control board.
+
+## Preserve the core sections from the reference dashboard
+The main dashboard must preserve the reference-style grouped structure and its main section logic, including groups equivalent to these areas:
+- Sales / فرۆشتن
+- Purchase / کڕین
+- General services / بەشەکانی تر
+
+Inside that system, preserve the same idea of grouped module cards such as:
+- sales
+- daily sales
+- sales to brick kiln
+- customer payment receiving
+- customer statement
+- customer invoice list
+- expense report related sales support
+- customer names
+- purchase by dinar
+- daily purchase
+- advance/payment to suppliers
+- supplier debt/invoice tracking
+- purchase report
+- exchange rate
+- supplier names
+- cashbox / صندوق
+- expenses / مەسروف
+- revenues / داهات
+- money transfer in/out
+- shareholders / پارەهێنان / پارەبردن if applicable by system logic
+- materials / موادەکان
+- payroll / wage
+- labor-related modules
+- permissions / roles if already present
+- printer settings / backup / exit or equivalent utility modules if needed
+
+## Very important clarification
+Do not reduce the system only to the exact number of cards in the image.
+The image is the direct visual model.
+But Mad Factory needs more business modules.
+So the correct implementation is:
+- keep all core visible sections from the reference dashboard
+- keep the same grouped grid style
+- add the extra required Mad Factory modules in the same style
+- if there are more modules than the image, expand with extra grouped rows or extra grouped blocks without breaking the visual language
+
+## Functional requirement
+This time I want real functionality, not only appearance.
+Every important dashboard card/module should open a real working page, list, form, or report.
+The user must be able to click modules and actually perform operations.
+
+## System requirements to make functional
+Build or complete the system so these parts are real and connected:
+
+### 1) Dashboard behavior
+- clicking any module opens its page correctly
+- dashboard sections remain organized
+- the top header remains visible and clean
+- USD exchange rate must always be visible in the top area
+- when exchange rate changes, the top display must update immediately
+
+### 2) Language and localization
+- all visible UI text must be Kurdish Sorani
+- all numbers must be English numerals only
+- layout must stay RTL where appropriate
+- keep wording practical for factory/accounting use
+
+### 3) Database-backed behavior
+- the system must use a real database, not fake mock data only
+- module pages must read/write real persisted data
+- forms must save correctly
+- edited data must remain after refresh
+- lists, statements, invoices, reports, and settings must load from the database
+
+### 4) Sales modules
+Make these truly functional:
+- sales entry
+- daily sales
+- kiln-related sales if part of the business workflow
+- customer payment receiving
+- customer debt/account statement
+- customer invoices
+- customer report pages
+- customer names / customer management
+
+### 5) Purchase modules
+Make these truly functional:
+- purchase by dinar
+- daily purchase
+- purchase by USD if used in workflow
+- supplier advance/payment
+- supplier debt/account statement
+- supplier invoices
+- supplier reports
+- supplier names / supplier management
+
+### 6) Finance and treasury
+Make these truly functional:
+- cashbox / صندوق
+- expenses
+- revenues
+- money transfer in and out
+- general treasury movement history
+- ability to reflect real financial flows into reports
+
+### 7) Exchange rate logic
+This is critical:
+- exchange rate must be editable by date
+- the latest active rate must appear in the top header at all times
+- saving a new rate must persist correctly
+- after save, header must refresh immediately
+- settings value and header value must always match
+- do not use stale state or hardcoded fallback after successful save
+
+### 8) Shareholders and profit logic
+Make these truly functional if part of the system:
+- shareholders list
+- ability to add and edit shares
+- share-related records
+- monthly profit/loss calculation
+- profit distribution across shares
+- financial closing logic that depends on actual stored data
+
+### 9) HR / payroll / workers
+Make these functional if they are part of current business logic:
+- worker list
+- wages/payroll
+- role/permission management if applicable
+- attendance or related workforce records only if already in scope
+
+### 10) Materials and supporting modules
+Make these functional if present in the design/business logic:
+- materials list
+- material movement or usage records
+- printing settings if needed
+- backup utility if needed
+
+## Invoice and voucher requirement
+This is very important.
+When I open invoice/voucher-related items:
+- clicking a voucher/invoice should open the full voucher/invoice view
+- the opened voucher must feel like a real document page, not just a tiny modal
+- I must be able to print it
+- I must be able to export it to Excel where relevant
+- the list page should connect properly to the opened document
+
+## UI quality requirement
+Keep the design polished.
+Do not make it ugly while adding functionality.
+I specifically want:
+- good icons
+- consistent icon style
+- balanced card sizes
+- elegant grouped blocks
+- polished header
+- buttons that feel crafted and not random
+- soft but clear colors close to the reference dashboard
+- proper spacing and hierarchy
+
+## What NOT to do
+- do not replace the dashboard with a sidebar app shell
+- do not change the visual direction to something generic
+- do not make it look like a normal admin template
+- do not remove the grouped colored dashboard logic
+- do not break working pages while adding new ones
+- do not leave modules as dead buttons if they are expected to work
+- do not use only mock data if real persistence is required
+- do not switch the language away from Kurdish Sorani
+- do not change numerals into Arabic/Persian numerals
+
+## Final result I expect
+I want a version where:
+- the dashboard still looks almost like the reference image
+- all core sections from the reference are still there
+- extra Mad Factory modules are added in the same grouped grid style
+- the system is truly functional
+- major modules open real pages and forms
+- database persistence works
+- exchange rate logic works correctly
+- invoice/voucher opening works correctly
+- print and Excel export work where required
+- the UI remains polished and visually coherent
+- the whole system feels like a real Kurdish factory management system, not a mockup
+
+Inspect the current codebase carefully.
+Preserve the current progress where it is good.
+Then complete the missing functionality in a clean way without losing the dashboard style.

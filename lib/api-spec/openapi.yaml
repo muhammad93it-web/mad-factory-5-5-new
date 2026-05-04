@@ -1,0 +1,3408 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Mad Factory - Factory Management System API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: customers
+    description: Customer management
+  - name: suppliers
+    description: Supplier management
+  - name: materials
+    description: Materials/items management
+  - name: sales
+    description: Sales invoices
+  - name: purchases
+    description: Purchase invoices
+  - name: payments
+    description: Payments
+  - name: exchange-rates
+    description: USD exchange rates
+  - name: employees
+    description: Employee management
+  - name: payroll
+    description: Payroll management
+  - name: expenses
+    description: Expenses
+  - name: incomes
+    description: Other income
+  - name: shareholders
+    description: Shareholder management
+  - name: cashbox
+    description: Cashbox and financial dashboard
+  - name: reports
+    description: Reports and summaries
+  - name: alerts
+    description: Overdue alerts
+  - name: settings
+    description: App settings
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── Customers ──────────────────────────────────────────────────────────────
+  /customers:
+    get:
+      operationId: listCustomers
+      tags: [customers]
+      summary: List all customers
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+    post:
+      operationId: createCustomer
+      tags: [customers]
+      summary: Create a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+
+  /customers/{id}:
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Customer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateCustomer
+      tags: [customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCustomerBody"
+      responses:
+        "200":
+          description: Updated customer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+    delete:
+      operationId: deleteCustomer
+      tags: [customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /customers/{id}/statement:
+    get:
+      operationId: getCustomerStatement
+      tags: [customers]
+      summary: Get customer account statement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer account statement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountStatement"
+
+  /customers/{id}/opening-balance:
+    post:
+      operationId: setCustomerOpeningBalance
+      tags: [customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpeningBalanceBody"
+      responses:
+        "200":
+          description: Updated
+
+  # ── Suppliers ──────────────────────────────────────────────────────────────
+  /suppliers:
+    get:
+      operationId: listSuppliers
+      tags: [suppliers]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of suppliers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Supplier"
+    post:
+      operationId: createSupplier
+      tags: [suppliers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplierBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+
+  /suppliers/{id}:
+    get:
+      operationId: getSupplier
+      tags: [suppliers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateSupplier
+      tags: [suppliers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSupplierBody"
+      responses:
+        "200":
+          description: Updated supplier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Supplier"
+    delete:
+      operationId: deleteSupplier
+      tags: [suppliers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /suppliers/{id}/statement:
+    get:
+      operationId: getSupplierStatement
+      tags: [suppliers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Supplier account statement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountStatement"
+
+  /suppliers/{id}/opening-balance:
+    post:
+      operationId: setSupplierOpeningBalance
+      tags: [suppliers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpeningBalanceBody"
+      responses:
+        "200":
+          description: Updated
+
+  # ── Materials ─────────────────────────────────────────────────────────────
+  /materials:
+    get:
+      operationId: listMaterials
+      tags: [materials]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Filter by item type (buy returns buy+both, sell returns sell+both)
+          schema:
+            type: string
+            enum: [buy, sell, both]
+      responses:
+        "200":
+          description: List of materials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Material"
+    post:
+      operationId: createMaterial
+      tags: [materials]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMaterialBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Material"
+
+  /materials/{id}:
+    get:
+      operationId: getMaterial
+      tags: [materials]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Material
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Material"
+    patch:
+      operationId: updateMaterial
+      tags: [materials]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMaterialBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Material"
+    delete:
+      operationId: deleteMaterial
+      tags: [materials]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Sales Invoices ─────────────────────────────────────────────────────────
+  /sales:
+    get:
+      operationId: listSalesInvoices
+      tags: [sales]
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of sales invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SalesInvoice"
+    post:
+      operationId: createSalesInvoice
+      tags: [sales]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSalesInvoiceBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SalesInvoice"
+
+  /sales/{id}:
+    get:
+      operationId: getSalesInvoice
+      tags: [sales]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sales invoice with items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SalesInvoiceDetail"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateSalesInvoice
+      tags: [sales]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSalesInvoiceBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SalesInvoice"
+    delete:
+      operationId: deleteSalesInvoice
+      tags: [sales]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /sales/daily-report:
+    get:
+      operationId: getDailySalesReport
+      tags: [sales]
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Daily sales report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyReport"
+
+  # ── Customer Payments ──────────────────────────────────────────────────────
+  /customer-payments:
+    get:
+      operationId: listCustomerPayments
+      tags: [payments]
+      parameters:
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of customer payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CustomerPayment"
+    post:
+      operationId: createCustomerPayment
+      tags: [payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomerPaymentBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerPayment"
+
+  /customer-payments/{id}:
+    get:
+      operationId: getCustomerPayment
+      tags: [payments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Customer payment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerPayment"
+    delete:
+      operationId: deleteCustomerPayment
+      tags: [payments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Purchase Invoices (IQD) ────────────────────────────────────────────────
+  /purchases:
+    get:
+      operationId: listPurchaseInvoices
+      tags: [purchases]
+      parameters:
+        - name: supplierId
+          in: query
+          schema:
+            type: integer
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+        - name: currency
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of purchase invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PurchaseInvoice"
+    post:
+      operationId: createPurchaseInvoice
+      tags: [purchases]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePurchaseInvoiceBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseInvoice"
+
+  /purchases/{id}:
+    get:
+      operationId: getPurchaseInvoice
+      tags: [purchases]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Purchase invoice with items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseInvoiceDetail"
+        "404":
+          description: Not found
+    patch:
+      operationId: updatePurchaseInvoice
+      tags: [purchases]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePurchaseInvoiceBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseInvoice"
+    delete:
+      operationId: deletePurchaseInvoice
+      tags: [purchases]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /purchases/daily-report:
+    get:
+      operationId: getDailyPurchasesReport
+      tags: [purchases]
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Daily purchases report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyReport"
+
+  # ── Supplier Payments ──────────────────────────────────────────────────────
+  /supplier-payments:
+    get:
+      operationId: listSupplierPayments
+      tags: [payments]
+      parameters:
+        - name: supplierId
+          in: query
+          schema:
+            type: integer
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of supplier payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupplierPayment"
+    post:
+      operationId: createSupplierPayment
+      tags: [payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplierPaymentBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplierPayment"
+
+  /supplier-payments/{id}:
+    get:
+      operationId: getSupplierPayment
+      tags: [payments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Supplier payment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplierPayment"
+    delete:
+      operationId: deleteSupplierPayment
+      tags: [payments]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Exchange Rates ─────────────────────────────────────────────────────────
+  /exchange-rates:
+    get:
+      operationId: listExchangeRates
+      tags: [exchange-rates]
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of exchange rates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExchangeRate"
+    post:
+      operationId: createExchangeRate
+      tags: [exchange-rates]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateExchangeRateBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExchangeRate"
+
+  /exchange-rates/latest:
+    get:
+      operationId: getLatestExchangeRate
+      tags: [exchange-rates]
+      summary: Get the latest USD exchange rate
+      responses:
+        "200":
+          description: Latest exchange rate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExchangeRate"
+
+  /exchange-rates/{id}:
+    patch:
+      operationId: updateExchangeRate
+      tags: [exchange-rates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateExchangeRateBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExchangeRate"
+
+  # ── Employees ──────────────────────────────────────────────────────────────
+  /employees:
+    get:
+      operationId: listEmployees
+      tags: [employees]
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Employee"
+    post:
+      operationId: createEmployee
+      tags: [employees]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployeeBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+
+  /employees/{id}:
+    get:
+      operationId: getEmployee
+      tags: [employees]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Employee
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateEmployee
+      tags: [employees]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEmployeeBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+
+  # ── Payroll ────────────────────────────────────────────────────────────────
+  /payroll:
+    get:
+      operationId: listPayrollEntries
+      tags: [payroll]
+      parameters:
+        - name: employeeId
+          in: query
+          schema:
+            type: integer
+        - name: month
+          in: query
+          schema:
+            type: string
+        - name: year
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of payroll entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PayrollEntry"
+    post:
+      operationId: createPayrollEntry
+      tags: [payroll]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePayrollEntryBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayrollEntry"
+
+  /payroll/{id}:
+    get:
+      operationId: getPayrollEntry
+      tags: [payroll]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payroll entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayrollEntry"
+    patch:
+      operationId: updatePayrollEntry
+      tags: [payroll]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePayrollEntryBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayrollEntry"
+    delete:
+      operationId: deletePayrollEntry
+      tags: [payroll]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /payroll/report:
+    get:
+      operationId: getPayrollReport
+      tags: [payroll]
+      parameters:
+        - name: month
+          in: query
+          schema:
+            type: string
+        - name: year
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payroll report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayrollReport"
+
+  # ── Expenses ───────────────────────────────────────────────────────────────
+  /expenses:
+    get:
+      operationId: listExpenses
+      tags: [expenses]
+      parameters:
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Expense"
+    post:
+      operationId: createExpense
+      tags: [expenses]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateExpenseBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+
+  /expenses/{id}:
+    patch:
+      operationId: updateExpense
+      tags: [expenses]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateExpenseBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+    delete:
+      operationId: deleteExpense
+      tags: [expenses]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Other Incomes ──────────────────────────────────────────────────────────
+  /incomes:
+    get:
+      operationId: listIncomes
+      tags: [incomes]
+      parameters:
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of other incomes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Income"
+    post:
+      operationId: createIncome
+      tags: [incomes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateIncomeBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Income"
+
+  /incomes/{id}:
+    patch:
+      operationId: updateIncome
+      tags: [incomes]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateIncomeBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Income"
+    delete:
+      operationId: deleteIncome
+      tags: [incomes]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Shareholders ───────────────────────────────────────────────────────────
+  /shareholders:
+    get:
+      operationId: listShareholders
+      tags: [shareholders]
+      responses:
+        "200":
+          description: List of shareholders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Shareholder"
+    post:
+      operationId: createShareholder
+      tags: [shareholders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateShareholderBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shareholder"
+
+  /shareholders/{id}:
+    get:
+      operationId: getShareholder
+      tags: [shareholders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Shareholder
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shareholder"
+    patch:
+      operationId: updateShareholder
+      tags: [shareholders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateShareholderBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shareholder"
+    delete:
+      operationId: deleteShareholder
+      tags: [shareholders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /shareholder-transactions:
+    get:
+      operationId: listShareholderTransactions
+      tags: [shareholders]
+      parameters:
+        - name: shareholderId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of shareholder transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ShareholderTransaction"
+    post:
+      operationId: createShareholderTransaction
+      tags: [shareholders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateShareholderTransactionBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShareholderTransaction"
+
+  /shareholder-transactions/{id}:
+    delete:
+      operationId: deleteShareholderTransaction
+      tags: [shareholders]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Cashbox / Financial Dashboard ─────────────────────────────────────────
+  /cashbox/summary:
+    get:
+      operationId: getCashboxSummary
+      tags: [cashbox]
+      summary: Get overall cashbox / financial summary
+      parameters:
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cashbox summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CashboxSummary"
+
+  /cashbox/monthly-report:
+    get:
+      operationId: getMonthlyReport
+      tags: [cashbox]
+      summary: Monthly financial closing report
+      parameters:
+        - name: month
+          in: query
+          schema:
+            type: string
+        - name: year
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Monthly financial report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonthlyReport"
+
+  /cashbox/profit-loss:
+    get:
+      operationId: getProfitLossReport
+      tags: [cashbox]
+      parameters:
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Profit and loss report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfitLossReport"
+
+  /cashbox/closing:
+    get:
+      operationId: getCashboxClosing
+      tags: [cashbox]
+      summary: Daily/period cashbox close-out (worksheet-style)
+      parameters:
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cashbox closing report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CashboxClosingReport"
+
+  /cashbox/treasury-movements:
+    get:
+      operationId: listTreasuryMovements
+      tags: [cashbox]
+      summary: Chronological list of all treasury (cash) movements
+      parameters:
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chronological treasury movements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TreasuryMovement"
+
+  /cashbox/monthly-closings:
+    get:
+      operationId: listMonthlyClosings
+      tags: [cashbox]
+      responses:
+        "200":
+          description: List of saved monthly closings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyClosing"
+    post:
+      operationId: createMonthlyClosing
+      tags: [cashbox]
+      summary: Calculate and persist a monthly closing snapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMonthlyClosingBody"
+      responses:
+        "201":
+          description: Created closing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonthlyClosingDetail"
+
+  /cashbox/monthly-closings/{id}:
+    get:
+      operationId: getMonthlyClosing
+      tags: [cashbox]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Closing with shareholder distributions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonthlyClosingDetail"
+    delete:
+      operationId: deleteMonthlyClosing
+      tags: [cashbox]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /cashbox/monthly-closings/{id}/reopen:
+    post:
+      operationId: reopenMonthlyClosing
+      tags: [cashbox]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reopened closing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonthlyClosing"
+
+  # ── Alerts ─────────────────────────────────────────────────────────────────
+  /alerts/overdue:
+    get:
+      operationId: getOverdueAlerts
+      tags: [alerts]
+      summary: Get overdue customer and supplier balances
+      responses:
+        "200":
+          description: List of overdue alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OverdueAlert"
+
+  # ── Settings ───────────────────────────────────────────────────────────────
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      responses:
+        "200":
+          description: App settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+    patch:
+      operationId: updateSettings
+      tags: [settings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsBody"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+
+  /settings/verify-delete-pin:
+    post:
+      operationId: verifyDeletePin
+      tags: [settings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyDeletePinBody"
+      responses:
+        "200":
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyDeletePinResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    # ── Customer ──────────────────────────────────────────────────────────────
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+        openingBalance:
+          type: number
+        totalDebt:
+          type: number
+        totalPaid:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - isActive
+        - openingBalance
+        - totalDebt
+        - totalPaid
+        - createdAt
+        - updatedAt
+
+    CreateCustomerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        openingBalance:
+          type: number
+      required:
+        - name
+
+    UpdateCustomerBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+
+    # ── Supplier ───────────────────────────────────────────────────────────────
+    Supplier:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+        openingBalance:
+          type: number
+        totalDebt:
+          type: number
+        totalPaid:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - isActive
+        - openingBalance
+        - totalDebt
+        - totalPaid
+        - createdAt
+        - updatedAt
+
+    CreateSupplierBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        openingBalance:
+          type: number
+      required:
+        - name
+
+    UpdateSupplierBody:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+
+    # ── Material ───────────────────────────────────────────────────────────────
+    Material:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        unit:
+          type: ["string", "null"]
+        purchasePrice:
+          type: number
+        salePrice:
+          type: ["number", "null"]
+        profitMargin:
+          type: ["number", "null"]
+        profit:
+          type: ["number", "null"]
+        category:
+          type: ["string", "null"]
+        bricksPerPallet:
+          type: ["integer", "null"]
+        itemType:
+          type: string
+          enum: [buy, sell, both]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - purchasePrice
+        - itemType
+        - isActive
+        - createdAt
+        - updatedAt
+
+    CreateMaterialBody:
+      type: object
+      properties:
+        name:
+          type: string
+        unit:
+          type: ["string", "null"]
+        purchasePrice:
+          type: number
+        salePrice:
+          type: ["number", "null"]
+        profitMargin:
+          type: ["number", "null"]
+        profit:
+          type: ["number", "null"]
+        category:
+          type: ["string", "null"]
+        bricksPerPallet:
+          type: ["integer", "null"]
+        itemType:
+          type: string
+          enum: [buy, sell, both]
+        notes:
+          type: ["string", "null"]
+      required:
+        - name
+
+    UpdateMaterialBody:
+      type: object
+      properties:
+        name:
+          type: string
+        unit:
+          type: ["string", "null"]
+        purchasePrice:
+          type: number
+        salePrice:
+          type: ["number", "null"]
+        profitMargin:
+          type: ["number", "null"]
+        profit:
+          type: ["number", "null"]
+        category:
+          type: ["string", "null"]
+        bricksPerPallet:
+          type: ["integer", "null"]
+        itemType:
+          type: string
+          enum: [buy, sell, both]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+
+    # ── Invoice Item (shared) ─────────────────────────────────────────────────
+    InvoiceItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        materialId:
+          type: ["integer", "null"]
+        materialName:
+          type: string
+        quantity:
+          type: number
+        palletCount:
+          type: ["number", "null"]
+        bricksPerPallet:
+          type: ["number", "null"]
+        totalBricks:
+          type: ["number", "null"]
+        unitPrice:
+          type: number
+        total:
+          type: number
+        notes:
+          type: ["string", "null"]
+      required:
+        - id
+        - materialName
+        - quantity
+        - unitPrice
+        - total
+
+    InvoiceItemInput:
+      type: object
+      properties:
+        materialId:
+          type: ["integer", "null"]
+        materialName:
+          type: string
+        quantity:
+          type: number
+        palletCount:
+          type: ["number", "null"]
+        bricksPerPallet:
+          type: ["number", "null"]
+        totalBricks:
+          type: ["number", "null"]
+        unitPrice:
+          type: number
+        notes:
+          type: ["string", "null"]
+      required:
+        - materialName
+        - quantity
+        - unitPrice
+
+    # ── Sales Invoice ─────────────────────────────────────────────────────────
+    SalesInvoice:
+      type: object
+      properties:
+        id:
+          type: integer
+        invoiceNumber:
+          type: string
+        customerId:
+          type: integer
+        customerName:
+          type: string
+        invoiceDate:
+          type: string
+        customerMobile:
+          type: ["string", "null"]
+        customerAddress:
+          type: ["string", "null"]
+        driver:
+          type: ["string", "null"]
+        driverMobile:
+          type: ["string", "null"]
+        vehicle:
+          type: ["string", "null"]
+        guarantorName:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        subtotal:
+          type: number
+        discount:
+          type: number
+        total:
+          type: number
+        paidAmount:
+          type: number
+        remainingDebt:
+          type: number
+        previousDebt:
+          type: number
+        isDeleted:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - invoiceNumber
+        - customerId
+        - customerName
+        - invoiceDate
+        - subtotal
+        - discount
+        - total
+        - paidAmount
+        - remainingDebt
+        - previousDebt
+        - isDeleted
+        - createdAt
+        - updatedAt
+
+    SalesInvoiceDetail:
+      allOf:
+        - $ref: "#/components/schemas/SalesInvoice"
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/InvoiceItem"
+          required:
+            - items
+
+    CreateSalesInvoiceBody:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        invoiceDate:
+          type: string
+        customerMobile:
+          type: ["string", "null"]
+        customerAddress:
+          type: ["string", "null"]
+        driver:
+          type: ["string", "null"]
+        driverMobile:
+          type: ["string", "null"]
+        vehicle:
+          type: ["string", "null"]
+        guarantorName:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        discount:
+          type: number
+        paidAmount:
+          type: number
+        previousDebt:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceItemInput"
+      required:
+        - customerId
+        - invoiceDate
+        - items
+
+    UpdateSalesInvoiceBody:
+      type: object
+      properties:
+        invoiceDate:
+          type: string
+        customerMobile:
+          type: ["string", "null"]
+        customerAddress:
+          type: ["string", "null"]
+        driver:
+          type: ["string", "null"]
+        driverMobile:
+          type: ["string", "null"]
+        vehicle:
+          type: ["string", "null"]
+        guarantorName:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        discount:
+          type: number
+        paidAmount:
+          type: number
+        previousDebt:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceItemInput"
+
+    # ── Customer Payment ──────────────────────────────────────────────────────
+    CustomerPayment:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        customerName:
+          type: string
+        amount:
+          type: number
+        paymentDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - customerId
+        - customerName
+        - amount
+        - paymentDate
+        - createdAt
+
+    CreateCustomerPaymentBody:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        amount:
+          type: number
+        paymentDate:
+          type: string
+        voucherType:
+          type: string
+          enum: [cash, internal]
+        notes:
+          type: ["string", "null"]
+      required:
+        - customerId
+        - amount
+        - paymentDate
+
+    # ── Purchase Invoice ──────────────────────────────────────────────────────
+    PurchaseInvoice:
+      type: object
+      properties:
+        id:
+          type: integer
+        invoiceNumber:
+          type: string
+        supplierId:
+          type: integer
+        supplierName:
+          type: string
+        invoiceDate:
+          type: string
+        currency:
+          type: string
+        exchangeRateId:
+          type: ["integer", "null"]
+        exchangeRateValue:
+          type: ["number", "null"]
+        supplierMobile:
+          type: ["string", "null"]
+        supplierAddress:
+          type: ["string", "null"]
+        driver:
+          type: ["string", "null"]
+        driverMobile:
+          type: ["string", "null"]
+        vehicle:
+          type: ["string", "null"]
+        guarantorName:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        subtotal:
+          type: number
+        subtotalIqd:
+          type: number
+        discount:
+          type: number
+        total:
+          type: number
+        totalIqd:
+          type: number
+        paidAmount:
+          type: number
+        paidAmountIqd:
+          type: number
+        remainingDebt:
+          type: number
+        remainingDebtIqd:
+          type: number
+        previousDebt:
+          type: number
+        isDeleted:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - invoiceNumber
+        - supplierId
+        - supplierName
+        - invoiceDate
+        - currency
+        - subtotal
+        - subtotalIqd
+        - discount
+        - total
+        - totalIqd
+        - paidAmount
+        - paidAmountIqd
+        - remainingDebt
+        - remainingDebtIqd
+        - previousDebt
+        - isDeleted
+        - createdAt
+        - updatedAt
+
+    PurchaseInvoiceDetail:
+      allOf:
+        - $ref: "#/components/schemas/PurchaseInvoice"
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/InvoiceItem"
+          required:
+            - items
+
+    CreatePurchaseInvoiceBody:
+      type: object
+      properties:
+        supplierId:
+          type: integer
+        invoiceDate:
+          type: string
+        currency:
+          type: string
+        exchangeRateId:
+          type: ["integer", "null"]
+        supplierMobile:
+          type: ["string", "null"]
+        supplierAddress:
+          type: ["string", "null"]
+        driver:
+          type: ["string", "null"]
+        driverMobile:
+          type: ["string", "null"]
+        vehicle:
+          type: ["string", "null"]
+        guarantorName:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        discount:
+          type: number
+        paidAmount:
+          type: number
+        previousDebt:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceItemInput"
+      required:
+        - supplierId
+        - invoiceDate
+        - currency
+        - items
+
+    UpdatePurchaseInvoiceBody:
+      type: object
+      properties:
+        invoiceDate:
+          type: string
+        supplierMobile:
+          type: ["string", "null"]
+        supplierAddress:
+          type: ["string", "null"]
+        driver:
+          type: ["string", "null"]
+        driverMobile:
+          type: ["string", "null"]
+        vehicle:
+          type: ["string", "null"]
+        guarantorName:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        discount:
+          type: number
+        paidAmount:
+          type: number
+        previousDebt:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceItemInput"
+
+    # ── Supplier Payment ──────────────────────────────────────────────────────
+    SupplierPayment:
+      type: object
+      properties:
+        id:
+          type: integer
+        supplierId:
+          type: integer
+        supplierName:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        exchangeRateId:
+          type: ["integer", "null"]
+        amountIqd:
+          type: number
+        paymentDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - supplierId
+        - supplierName
+        - amount
+        - currency
+        - amountIqd
+        - paymentDate
+        - createdAt
+
+    CreateSupplierPaymentBody:
+      type: object
+      properties:
+        supplierId:
+          type: integer
+        amount:
+          type: number
+        currency:
+          type: string
+        exchangeRateId:
+          type: ["integer", "null"]
+        paymentDate:
+          type: string
+        voucherType:
+          type: string
+          enum: [cash, internal]
+        notes:
+          type: ["string", "null"]
+      required:
+        - supplierId
+        - amount
+        - currency
+        - paymentDate
+
+    # ── Exchange Rate ─────────────────────────────────────────────────────────
+    ExchangeRate:
+      type: object
+      properties:
+        id:
+          type: integer
+        rate:
+          type: number
+        rateDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - rate
+        - rateDate
+        - createdAt
+
+    CreateExchangeRateBody:
+      type: object
+      properties:
+        rate:
+          type: number
+        rateDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - rate
+        - rateDate
+
+    # ── Employee ──────────────────────────────────────────────────────────────
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        role:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        guarantor:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        salary:
+          type: number
+        isActive:
+          type: boolean
+        hireDate:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - code
+        - name
+        - salary
+        - isActive
+        - createdAt
+        - updatedAt
+
+    CreateEmployeeBody:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        role:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        guarantor:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        salary:
+          type: number
+        hireDate:
+          type: ["string", "null"]
+      required:
+        - code
+        - name
+        - salary
+
+    UpdateEmployeeBody:
+      type: object
+      properties:
+        name:
+          type: string
+        role:
+          type: ["string", "null"]
+        phone:
+          type: ["string", "null"]
+        phone2:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        guarantor:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        salary:
+          type: number
+        isActive:
+          type: boolean
+        hireDate:
+          type: ["string", "null"]
+
+    # ── Payroll ───────────────────────────────────────────────────────────────
+    PayrollEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        employeeId:
+          type: integer
+        employeeName:
+          type: string
+        employeeCode:
+          type: string
+        period:
+          type: string
+        workDays:
+          type: ["number", "null"]
+        baseSalary:
+          type: number
+        bonus:
+          type: number
+        deductions:
+          type: number
+        totalDue:
+          type: number
+        paidAmount:
+          type: number
+        remainingAmount:
+          type: number
+        paymentDate:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - employeeId
+        - employeeName
+        - employeeCode
+        - period
+        - baseSalary
+        - bonus
+        - deductions
+        - totalDue
+        - paidAmount
+        - remainingAmount
+        - createdAt
+        - updatedAt
+
+    CreatePayrollEntryBody:
+      type: object
+      properties:
+        employeeId:
+          type: integer
+        period:
+          type: string
+        workDays:
+          type: ["number", "null"]
+        baseSalary:
+          type: number
+        bonus:
+          type: number
+        deductions:
+          type: number
+        paidAmount:
+          type: number
+        paymentDate:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+      required:
+        - employeeId
+        - period
+        - baseSalary
+
+    UpdatePayrollEntryBody:
+      type: object
+      properties:
+        workDays:
+          type: ["number", "null"]
+        bonus:
+          type: number
+        deductions:
+          type: number
+        paidAmount:
+          type: number
+        paymentDate:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+
+    PayrollReport:
+      type: object
+      properties:
+        period:
+          type: string
+        totalDue:
+          type: number
+        totalPaid:
+          type: number
+        totalRemaining:
+          type: number
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/PayrollEntry"
+      required:
+        - period
+        - totalDue
+        - totalPaid
+        - totalRemaining
+        - entries
+
+    # ── Expense ───────────────────────────────────────────────────────────────
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        expenseDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - category
+        - description
+        - amount
+        - expenseDate
+        - createdAt
+
+    CreateExpenseBody:
+      type: object
+      properties:
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        expenseDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - category
+        - description
+        - amount
+        - expenseDate
+
+    UpdateExpenseBody:
+      type: object
+      properties:
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        expenseDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+
+    # ── Income ────────────────────────────────────────────────────────────────
+    Income:
+      type: object
+      properties:
+        id:
+          type: integer
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        incomeDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - category
+        - description
+        - amount
+        - incomeDate
+        - createdAt
+
+    CreateIncomeBody:
+      type: object
+      properties:
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        incomeDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - category
+        - description
+        - amount
+        - incomeDate
+
+    UpdateIncomeBody:
+      type: object
+      properties:
+        category:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        incomeDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+
+    # ── Shareholder ───────────────────────────────────────────────────────────
+    Shareholder:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sharePercentage:
+          type: number
+        shareAmount:
+          type: ["number", "null"]
+        phone:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+        totalWithdrawn:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - sharePercentage
+        - isActive
+        - totalWithdrawn
+        - createdAt
+        - updatedAt
+
+    CreateShareholderBody:
+      type: object
+      properties:
+        name:
+          type: string
+        sharePercentage:
+          type: number
+        shareCount:
+          type: ["number", "null"]
+        shareAmount:
+          type: ["number", "null"]
+        phone:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+      required:
+        - name
+        - sharePercentage
+
+    UpdateShareholderBody:
+      type: object
+      properties:
+        name:
+          type: string
+        sharePercentage:
+          type: number
+        shareAmount:
+          type: ["number", "null"]
+        phone:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+
+    ShareholderTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        shareholderId:
+          type: integer
+        shareholderName:
+          type: string
+        type:
+          type: string
+        amount:
+          type: number
+        transactionDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - shareholderId
+        - shareholderName
+        - type
+        - amount
+        - transactionDate
+        - createdAt
+
+    CreateShareholderTransactionBody:
+      type: object
+      properties:
+        shareholderId:
+          type: integer
+        type:
+          type: string
+        amount:
+          type: number
+        transactionDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - shareholderId
+        - type
+        - amount
+        - transactionDate
+
+    # ── Account Statement (shared) ────────────────────────────────────────────
+    StatementEntry:
+      type: object
+      properties:
+        date:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        debit:
+          type: number
+        credit:
+          type: number
+        balance:
+          type: number
+        referenceId:
+          type: ["integer", "null"]
+      required:
+        - date
+        - type
+        - description
+        - debit
+        - credit
+        - balance
+
+    AccountStatement:
+      type: object
+      properties:
+        entityId:
+          type: integer
+        entityName:
+          type: string
+        openingBalance:
+          type: number
+        totalDebit:
+          type: number
+        totalCredit:
+          type: number
+        closingBalance:
+          type: number
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatementEntry"
+      required:
+        - entityId
+        - entityName
+        - openingBalance
+        - totalDebit
+        - totalCredit
+        - closingBalance
+        - entries
+
+    # ── Daily Report ──────────────────────────────────────────────────────────
+    DailyReport:
+      type: object
+      properties:
+        date:
+          type: string
+        totalInvoices:
+          type: integer
+        totalAmount:
+          type: number
+        totalPaid:
+          type: number
+        totalDebt:
+          type: number
+        invoices:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              invoiceNumber:
+                type: string
+              entityName:
+                type: string
+              total:
+                type: number
+              paidAmount:
+                type: number
+              remainingDebt:
+                type: number
+            required:
+              - id
+              - invoiceNumber
+              - entityName
+              - total
+              - paidAmount
+              - remainingDebt
+      required:
+        - date
+        - totalInvoices
+        - totalAmount
+        - totalPaid
+        - totalDebt
+        - invoices
+
+    # ── Cashbox Summary ───────────────────────────────────────────────────────
+    CashboxSummary:
+      type: object
+      properties:
+        fromDate:
+          type: ["string", "null"]
+        toDate:
+          type: ["string", "null"]
+        totalSalesRevenue:
+          type: number
+        totalCustomerPayments:
+          type: number
+        totalPurchasesPaid:
+          type: number
+        totalSupplierPayments:
+          type: number
+        totalPayroll:
+          type: number
+        totalExpenses:
+          type: number
+        totalOtherIncome:
+          type: number
+        totalShareholderWithdrawals:
+          type: number
+        cashIn:
+          type: number
+        cashOut:
+          type: number
+        netCash:
+          type: number
+        totalCustomerDebt:
+          type: number
+        totalSupplierDebt:
+          type: number
+        latestExchangeRate:
+          type: ["number", "null"]
+      required:
+        - totalSalesRevenue
+        - totalCustomerPayments
+        - totalPurchasesPaid
+        - totalSupplierPayments
+        - totalPayroll
+        - totalExpenses
+        - totalOtherIncome
+        - totalShareholderWithdrawals
+        - cashIn
+        - cashOut
+        - netCash
+        - totalCustomerDebt
+        - totalSupplierDebt
+
+    # ── Monthly Report ────────────────────────────────────────────────────────
+    MonthlyReport:
+      type: object
+      properties:
+        month:
+          type: string
+        year:
+          type: integer
+        totalSales:
+          type: number
+        totalPurchases:
+          type: number
+        totalExpenses:
+          type: number
+        totalPayroll:
+          type: number
+        totalOtherIncome:
+          type: number
+        totalShareholderWithdrawals:
+          type: number
+        grossProfit:
+          type: number
+        netProfit:
+          type: number
+        cashIn:
+          type: number
+        cashOut:
+          type: number
+        netCash:
+          type: number
+      required:
+        - month
+        - year
+        - totalSales
+        - totalPurchases
+        - totalExpenses
+        - totalPayroll
+        - totalOtherIncome
+        - totalShareholderWithdrawals
+        - grossProfit
+        - netProfit
+        - cashIn
+        - cashOut
+        - netCash
+
+    # ── Profit/Loss Report ────────────────────────────────────────────────────
+    ProfitLossReport:
+      type: object
+      properties:
+        fromDate:
+          type: ["string", "null"]
+        toDate:
+          type: ["string", "null"]
+        totalRevenue:
+          type: number
+        totalCost:
+          type: number
+        totalPurchases:
+          type: number
+        cogsMissingCount:
+          type: number
+        cogsMissingRevenue:
+          type: number
+        grossProfit:
+          type: number
+        totalExpenses:
+          type: number
+        totalPayroll:
+          type: number
+        otherIncome:
+          type: number
+        shareholderWithdrawals:
+          type: number
+        netProfit:
+          type: number
+        profitByShareholdersBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              shareholderName:
+                type: string
+              sharePercentage:
+                type: number
+              profitShare:
+                type: number
+            required:
+              - shareholderName
+              - sharePercentage
+              - profitShare
+      required:
+        - totalRevenue
+        - totalCost
+        - grossProfit
+        - totalExpenses
+        - totalPayroll
+        - otherIncome
+        - shareholderWithdrawals
+        - netProfit
+        - profitByShareholdersBreakdown
+
+    # ── Cashbox Closing (worksheet-style) ─────────────────────────────────────
+    CashboxClosingReport:
+      type: object
+      properties:
+        fromDate: { type: ["string", "null"] }
+        toDate: { type: ["string", "null"] }
+        sales:
+          type: object
+          properties:
+            gross: { type: number }
+            discount: { type: number }
+            net: { type: number }
+            cashReceivedTotal: { type: number }
+            cashReceivedCashVoucher: { type: number }
+            cashReceivedInternalVoucher: { type: number }
+            debtRemaining: { type: number }
+        purchasesIqd:
+          type: object
+          properties:
+            gross: { type: number }
+            discount: { type: number }
+            net: { type: number }
+            cashPaidTotal: { type: number }
+            cashPaidCashVoucher: { type: number }
+            cashPaidInternalVoucher: { type: number }
+            debtRemaining: { type: number }
+        purchasesUsd:
+          type: object
+          properties:
+            rate: { type: number }
+            grossUsd: { type: number }
+            discountUsd: { type: number }
+            netUsd: { type: number }
+            netIqd: { type: number }
+            cashPaidUsd: { type: number }
+            cashPaidIqd: { type: number }
+            cashPaidCashVoucherUsd: { type: number }
+            cashPaidInternalVoucherUsd: { type: number }
+            debtRemainingUsd: { type: number }
+            debtRemainingIqd: { type: number }
+        payroll:
+          type: object
+          properties:
+            due: { type: number }
+            paid: { type: number }
+            debt: { type: number }
+        otherExpenses: { type: number }
+        combined:
+          type: object
+          properties:
+            totalExpenses: { type: number }
+            totalCashPaid: { type: number }
+            totalDebtPayable: { type: number }
+        result:
+          type: object
+          properties:
+            profit: { type: number }
+            cashFlow: { type: number }
+            netDebtChange: { type: number }
+        shareholders:
+          type: object
+          properties:
+            totalShares: { type: number }
+            perShareValue: { type: number }
+            breakdown:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: { type: number }
+                  name: { type: string }
+                  shareCount: { type: number }
+                  sharePercentage: { type: number }
+                  profitShare: { type: number }
+        latestExchangeRate: { type: ["number", "null"] }
+
+    # ── Treasury / Closings ───────────────────────────────────────────────────
+    TreasuryMovement:
+      type: object
+      properties:
+        date:
+          type: string
+        type:
+          type: string
+        direction:
+          type: string
+        amount:
+          type: number
+        description:
+          type: string
+        sourceModule:
+          type: string
+        sourceId:
+          type: integer
+      required:
+        - date
+        - type
+        - direction
+        - amount
+        - description
+        - sourceModule
+        - sourceId
+
+    MonthlyClosing:
+      type: object
+      properties:
+        id:
+          type: integer
+        year:
+          type: integer
+        month:
+          type: string
+        status:
+          type: string
+        totalSales:
+          type: number
+        totalPurchases:
+          type: number
+        totalExpenses:
+          type: number
+        totalPayroll:
+          type: number
+        totalOtherIncome:
+          type: number
+        totalShareholderWithdrawals:
+          type: number
+        grossProfit:
+          type: number
+        netProfit:
+          type: number
+        cashIn:
+          type: number
+        cashOut:
+          type: number
+        notes:
+          type: ["string", "null"]
+        closedAt:
+          type: string
+        reopenedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - year
+        - month
+        - status
+        - totalSales
+        - totalPurchases
+        - totalExpenses
+        - totalPayroll
+        - totalOtherIncome
+        - totalShareholderWithdrawals
+        - grossProfit
+        - netProfit
+        - cashIn
+        - cashOut
+        - closedAt
+        - createdAt
+
+    ProfitDistribution:
+      type: object
+      properties:
+        id:
+          type: integer
+        closingId:
+          type: integer
+        shareholderId:
+          type: integer
+        shareholderName:
+          type: string
+        sharePercentage:
+          type: number
+        amount:
+          type: number
+        paidAmount:
+          type: number
+        paidAt:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+      required:
+        - id
+        - closingId
+        - shareholderId
+        - shareholderName
+        - sharePercentage
+        - amount
+        - paidAmount
+
+    MonthlyClosingDetail:
+      type: object
+      properties:
+        closing:
+          $ref: "#/components/schemas/MonthlyClosing"
+        distributions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProfitDistribution"
+      required:
+        - closing
+        - distributions
+
+    CreateMonthlyClosingBody:
+      type: object
+      properties:
+        year:
+          type: integer
+        month:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - year
+        - month
+
+    # ── Overdue Alert ─────────────────────────────────────────────────────────
+    OverdueAlert:
+      type: object
+      properties:
+        type:
+          type: string
+        entityId:
+          type: integer
+        entityName:
+          type: string
+        totalDebt:
+          type: number
+        oldestInvoiceDate:
+          type: ["string", "null"]
+        invoiceCount:
+          type: integer
+      required:
+        - type
+        - entityId
+        - entityName
+        - totalDebt
+        - invoiceCount
+
+    # ── Opening Balance ───────────────────────────────────────────────────────
+    OpeningBalanceBody:
+      type: object
+      properties:
+        amount:
+          type: number
+        notes:
+          type: ["string", "null"]
+      required:
+        - amount
+
+    # ── App Settings ──────────────────────────────────────────────────────────
+    AppSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        factoryName:
+          type: string
+        factoryNameKu:
+          type: string
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        currentExchangeRate:
+          type: ["number", "null"]
+        telegramBotToken:
+          type: ["string", "null"]
+        telegramChatId:
+          type: ["string", "null"]
+        emailRecipient:
+          type: ["string", "null"]
+        emailSmtpHost:
+          type: ["string", "null"]
+        emailSmtpPort:
+          type: ["string", "null"]
+        emailSmtpUser:
+          type: ["string", "null"]
+        emailSmtpPass:
+          type: ["string", "null"]
+        deletePin:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - factoryName
+        - factoryNameKu
+        - deletePin
+        - updatedAt
+
+    UpdateSettingsBody:
+      type: object
+      properties:
+        factoryName:
+          type: string
+        factoryNameKu:
+          type: string
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        telegramBotToken:
+          type: ["string", "null"]
+        telegramChatId:
+          type: ["string", "null"]
+        emailRecipient:
+          type: ["string", "null"]
+        emailSmtpHost:
+          type: ["string", "null"]
+        emailSmtpPort:
+          type: ["string", "null"]
+        emailSmtpUser:
+          type: ["string", "null"]
+        emailSmtpPass:
+          type: ["string", "null"]
+        deletePin:
+          type: string
+
+    VerifyDeletePinBody:
+      type: object
+      properties:
+        pin:
+          type: string
+      required:
+        - pin
+
+    VerifyDeletePinResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+      required:
+        - valid
