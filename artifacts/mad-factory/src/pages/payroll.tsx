@@ -212,7 +212,7 @@ export default function Payroll() {
   const fmt = (n: number) => new Intl.NumberFormat("en-US").format(Math.round(n));
 
   return (
-    <div className="-m-4 md:-m-6 h-screen flex flex-col overflow-hidden text-[12px]" dir="rtl" lang="en-US">
+    <div className="-m-4 md:-m-6 h-[calc(100vh-108px)] flex flex-col overflow-hidden text-[12px]" dir="rtl" lang="en-US">
       {/* HEADER */}
       <div className="bg-[#7030a0] text-white py-1.5 text-center shrink-0">
         <h1 className="text-xl font-bold tracking-widest" style={{ letterSpacing: "0.4em" }}>مووچەی کرێکاران</h1>
