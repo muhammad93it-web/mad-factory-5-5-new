@@ -5,7 +5,6 @@ import { formatMoney } from "@/lib/format";
 import { SearchableSelect } from "@/components/searchable-select";
 import { AutoTextarea } from "@/components/auto-textarea";
 import { PinConfirmModal } from "@/components/pin-confirm-modal";
-import { CustomerLedgerSummary } from "@/components/customer-ledger-summary";
 import { StatementOfAccountModal } from "@/components/statement-of-account-modal";
 import {
   useCreateSalesInvoice,
@@ -31,16 +30,16 @@ import {
   Lock,
   LockOpen,
   Printer,
+  Eye,
 } from "lucide-react";
 
 type InvoiceItem = {
   materialId: number | null;
   materialName: string;
-  group: string;
-  barcode: string;
-  quantity: number | null;
-  unitPrice: number;
-  itemDate: string;
+  bricksPerPallet: number | null;   // عدد فی بالێت
+  pallets: number | null;            // عدد بالێت
+  unitPrice: number;                 // السعر
+  itemDate: string;                  // تاریخ الحمل
 };
 
 const today = () => new Date().toISOString().split("T")[0];
@@ -48,9 +47,8 @@ const today = () => new Date().toISOString().split("T")[0];
 const emptyItem = (): InvoiceItem => ({
   materialId: null,
   materialName: "",
-  group: "",
-  barcode: "",
-  quantity: null,
+  bricksPerPallet: null,
+  pallets: null,
   unitPrice: 0,
   itemDate: today(),
 });
@@ -84,16 +82,20 @@ function PlainInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-// Single tiny row used in the bottom-left 6-stat totals stack.
+// Bilingual stat row used in the bottom-left totals stack.
+// Right column = bilingual label (Kurdish/Arabic), left = value with optional د.ع suffix.
 function StatRow({
-  label, value, accent, editable, onChange, readOnly,
+  labelKu, labelAr, value, accent, editable, onChange, readOnly, suffix, labelClassName,
 }: {
-  label: string;
+  labelKu: string;
+  labelAr?: string;
   value: string | number;
   accent?: "muted" | "warn" | "ok";
   editable?: boolean;
   onChange?: (v: number) => void;
   readOnly?: boolean;
+  suffix?: string;
+  labelClassName?: string;
 }) {
   const valueColor =
     accent === "warn"
@@ -102,23 +104,30 @@ function StatRow({
         ? "text-emerald-700"
         : "text-slate-900";
   return (
-    <div className="flex items-stretch border border-slate-300">
-      <div className="w-28 bg-cyan-100 text-slate-800 text-[12px] font-semibold flex items-center px-2 border-l border-slate-300">
-        {label}
+    <div className="flex items-stretch border border-slate-300 min-h-[28px]">
+      <div className={`w-44 text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 shrink-0 ${labelClassName ?? "bg-cyan-100"}`}>
+        <span className="truncate">
+          {labelKu}
+          {labelAr ? <span className="text-slate-500 font-normal"> / {labelAr}</span> : null}
+        </span>
       </div>
       {editable ? (
-        <input
-          type="number"
-          value={(value as number) || ""}
-          readOnly={readOnly}
-          onChange={(e) => onChange?.(Number(e.target.value))}
-          className={`flex-1 px-2 py-1 bg-white text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed`}
-          placeholder="0"
-          dir="ltr"
-        />
+        <div className="flex-1 flex items-stretch">
+          <input
+            type="number"
+            value={(value as number) || ""}
+            readOnly={readOnly}
+            onChange={(e) => onChange?.(Number(e.target.value))}
+            className={`flex-1 px-2 py-1 bg-white text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed min-w-0`}
+            placeholder="0"
+            dir="ltr"
+          />
+          {suffix ? <span className="px-2 flex items-center text-[11px] text-slate-500 bg-white">{suffix}</span> : null}
+        </div>
       ) : (
-        <div className={`flex-1 bg-white px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor}`} dir="ltr">
-          {value}
+        <div className={`flex-1 bg-white px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor} flex items-center justify-between`} dir="ltr">
+          <span className="truncate">{value}</span>
+          {suffix ? <span className="text-[11px] text-slate-500 ms-2 shrink-0">{suffix}</span> : null}
         </div>
       )}
     </div>
@@ -140,14 +149,14 @@ export default function SalesNew() {
   const [notes, setNotes] = useState("");
   const [searchPrev, setSearchPrev] = useState("");
 
-  // Hidden but preserved for backend payload compatibility
-  const [guarantorName] = useState("");
-  const [driver] = useState("");
-  const [driverMobile] = useState("");
+  // Header second row — guarantor & driver info (now visible)
+  const [guarantorName, setGuarantorName] = useState("");
+  const [driver, setDriver] = useState("");
+  const [driverMobile, setDriverMobile] = useState("");
 
-  // Totals (only 4 are exposed in spec; percentage discount preserved internally as 0)
+  // Totals
   const [discount, setDiscount] = useState(0);
-  const discountPercent = 0;
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
   const [previousDebt, setPreviousDebt] = useState(0);
 
@@ -202,14 +211,13 @@ export default function SalesNew() {
         if (i !== idx) return item;
         if (field === "materialId") {
           if (value === null) {
-            return { ...item, materialId: null, materialName: "", group: "", barcode: "" };
+            return { ...item, materialId: null, materialName: "" };
           }
           const mat = materials?.find((m: { id: number }) => m.id === Number(value));
           return {
             ...item,
             materialId: mat?.id ?? null,
             materialName: mat?.name ?? item.materialName,
-            group: (mat as { category?: string | null } | undefined)?.category ?? "",
             unitPrice: mat ? Number((mat as { salePrice?: number | null; purchasePrice: number }).salePrice ?? mat.purchasePrice) : item.unitPrice,
           };
         }
@@ -222,7 +230,8 @@ export default function SalesNew() {
   const removeRow = (idx: number) =>
     setItems((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
 
-  const lineTotal = (it: InvoiceItem) => (it.quantity ?? 0) * it.unitPrice;
+  const itemBricks = (it: InvoiceItem) => (it.pallets ?? 0) * (it.bricksPerPallet ?? 0);
+  const lineTotal = (it: InvoiceItem) => itemBricks(it) * it.unitPrice;
 
   const subtotal = items.reduce((s, i) => s + lineTotal(i), 0);
   const percentDiscountAmount = Math.round(subtotal * (discountPercent / 100));
@@ -230,13 +239,15 @@ export default function SalesNew() {
   const totalAfterDiscount = subtotal - effectiveDiscount;
   const grandTotal = totalAfterDiscount + previousDebt;
   const remaining = grandTotal - paidAmount;
-  const totalQuantity = items.reduce((s, i) => s + (i.quantity ?? 0), 0);
+  const totalPallets = items.reduce((s, i) => s + (i.pallets ?? 0), 0);
+  const totalBricks = items.reduce((s, i) => s + itemBricks(i), 0);
 
   const lastItem = items[items.length - 1];
   const canAddRow =
     !!lastItem &&
     !!lastItem.materialName &&
-    (lastItem.quantity ?? 0) > 0 &&
+    (lastItem.pallets ?? 0) > 0 &&
+    (lastItem.bricksPerPallet ?? 0) > 0 &&
     lastItem.unitPrice > 0;
 
   const resetForm = () => {
@@ -246,7 +257,11 @@ export default function SalesNew() {
     setInvoiceDate(today());
     setNotes("");
     setSearchPrev("");
+    setGuarantorName("");
+    setDriver("");
+    setDriverMobile("");
     setDiscount(0);
+    setDiscountPercent(0);
     setPaidAmount(0);
     setPreviousDebt(0);
     setItems([emptyItem()]);
@@ -288,7 +303,7 @@ export default function SalesNew() {
 
   const handleSubmit = () => {
     if (!customerId) return;
-    const validItems = items.filter((i) => i.materialName && (i.quantity ?? 0) > 0);
+    const validItems = items.filter((i) => i.materialName && (i.pallets ?? 0) > 0 && (i.bricksPerPallet ?? 0) > 0);
     if (!validItems.length) return;
     create({
       data: {
@@ -306,10 +321,10 @@ export default function SalesNew() {
         items: validItems.map((i) => ({
           materialId: i.materialId ?? undefined,
           materialName: i.materialName,
-          quantity: i.quantity ?? 0,
+          quantity: itemBricks(i),
           unitPrice: i.unitPrice,
-          totalBricks: i.quantity ?? undefined,
-          notes: i.barcode ? `بارکۆد: ${i.barcode}` : undefined,
+          totalBricks: itemBricks(i),
+          notes: `بالێت: ${i.pallets} × ${i.bricksPerPallet}`,
         })),
       },
     });
@@ -323,67 +338,103 @@ export default function SalesNew() {
           فرۆشتن
         </div>
 
-        {/* === TOP HEADER : 3 columns (right / middle / left in RTL) === */}
-        <div className="p-2 grid grid-cols-12 gap-2 border-b border-slate-300 bg-slate-50">
-          {/* RIGHT block — Receipt No / Date / Buyer Name */}
-          <div className="col-span-12 lg:col-span-4 space-y-1">
-            <FieldRow label="ژمارەی وەسڵ" labelWidth="w-28">
-              <PlainInput value={`${nextInvoiceNo} (جدید)`} readOnly className="font-mono font-bold text-slate-700 text-left" dir="ltr" />
-            </FieldRow>
-            <FieldRow label="بەروار" labelWidth="w-28">
-              <PlainInput type="date" value={invoiceDate} readOnly={editLocked} onChange={(e) => setInvoiceDate(e.target.value)} dir="ltr" />
-            </FieldRow>
-            <FieldRow label="ناوی کڕیار" labelWidth="w-28">
-              <SearchableSelect
-                value={customerId}
-                onChange={setCustomerId}
-                disabled={editLocked}
-                placeholder="گەڕان بە ناو / کۆد..."
-                buttonClassName="text-sm border-0 rounded-none h-[30px]"
-                options={(customers ?? []).map((c: { id: number; name: string }) => {
-                  const code = String(c.id).padStart(3, "0");
-                  return {
-                    value: String(c.id),
-                    label: c.name,
-                    sub: code,
-                    haystack: `${c.name} ${code}`,
-                  };
-                })}
-              />
-            </FieldRow>
+        {/* === TOP HEADER : 4 rows === */}
+        <div className="p-2 space-y-1 border-b border-slate-300 bg-slate-50">
+          {/* Row 1 (RTL right→left): ژ.وەسڵ | کۆد/کڕیار | بەروار | مۆبایل */}
+          <div className="grid grid-cols-12 gap-1">
+            <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+              <FieldRow label="ژ.وەسڵ" labelWidth="w-20">
+                <PlainInput value={nextInvoiceNo} readOnly className="font-mono font-bold text-slate-700 text-center" dir="ltr" />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+              <FieldRow label="کۆد/کڕیار" labelWidth="w-24">
+                <PlainInput
+                  value={customerId}
+                  onChange={(e) => setCustomerId(e.target.value)}
+                  readOnly={editLocked}
+                  placeholder="کۆد..."
+                  dir="ltr"
+                  className="text-center font-mono"
+                />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-4">
+              <FieldRow label="بەروار" labelWidth="w-20">
+                <PlainInput type="date" value={invoiceDate} readOnly={editLocked} onChange={(e) => setInvoiceDate(e.target.value)} dir="ltr" />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+              <FieldRow label="مۆبایل" labelWidth="w-20">
+                <PlainInput value={customerMobile} readOnly={editLocked} onChange={(e) => setCustomerMobile(e.target.value)} dir="ltr" placeholder="07XX..." />
+              </FieldRow>
+            </div>
           </div>
 
-          {/* MIDDLE block — Mobile / Address / Notes */}
-          <div className="col-span-12 lg:col-span-4 space-y-1">
-            <FieldRow label="مۆبایل" labelWidth="w-24">
-              <PlainInput value={customerMobile} readOnly={editLocked} onChange={(e) => setCustomerMobile(e.target.value)} dir="ltr" placeholder="07XX..." />
-            </FieldRow>
-            <FieldRow label="ناونیشان" labelWidth="w-24">
-              <PlainInput value={customerAddress} readOnly={editLocked} onChange={(e) => setCustomerAddress(e.target.value)} placeholder="ناونیشان..." />
-            </FieldRow>
-            <FieldRow label="تێبینی" labelWidth="w-24" alignTop>
-              <AutoTextarea
-                value={notes}
-                readOnly={editLocked}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="تێبینی..."
-                minRows={1}
-                maxRows={3}
-                className="read-only:cursor-not-allowed text-sm"
-              />
-            </FieldRow>
+          {/* Row 2: ناوی کەفیل | ناونیشان | ناوی شۆفێر | ز.م.شۆفێر */}
+          <div className="grid grid-cols-12 gap-1">
+            <div className="col-span-6 sm:col-span-3">
+              <FieldRow label="ناوی کەفیل" labelWidth="w-24">
+                <PlainInput value={guarantorName} readOnly={editLocked} onChange={(e) => setGuarantorName(e.target.value)} placeholder="ناوی کەفیل..." />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <FieldRow label="ناونیشان" labelWidth="w-24">
+                <PlainInput value={customerAddress} readOnly={editLocked} onChange={(e) => setCustomerAddress(e.target.value)} placeholder="ناونیشان..." />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <FieldRow label="ناوی شۆفێر" labelWidth="w-24">
+                <PlainInput value={driver} readOnly={editLocked} onChange={(e) => setDriver(e.target.value)} placeholder="ناوی شۆفێر..." />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3">
+              <FieldRow label="ز.م.شۆفێر" labelWidth="w-24">
+                <PlainInput value={driverMobile} readOnly={editLocked} onChange={(e) => setDriverMobile(e.target.value)} dir="ltr" placeholder="07XX..." />
+              </FieldRow>
+            </div>
           </div>
 
-          {/* LEFT block — Search by receipt no */}
-          <div className="col-span-12 lg:col-span-4 space-y-1">
-            <FieldRow label="گەڕان بە پێی ژمارەی وەسڵ" labelWidth="w-44">
-              <div className="flex h-full">
+          {/* Row 3: اسم/کڕیار (autocomplete) | کەشف حساب | dropdown — پسوولە — | گەڕان بەپێی ژ.وەسڵ */}
+          <div className="grid grid-cols-12 gap-1">
+            <div className="col-span-12 lg:col-span-6">
+              <FieldRow label="اسم/کڕیار" labelWidth="w-24">
+                <SearchableSelect
+                  value={customerId}
+                  onChange={setCustomerId}
+                  disabled={editLocked}
+                  placeholder="گەڕان بە ناو / کۆد / ژ.وەسڵ..."
+                  buttonClassName="text-sm border-0 rounded-none h-[30px]"
+                  options={(customers ?? []).map((c: { id: number; name: string }) => {
+                    const code = String(c.id).padStart(3, "0");
+                    return {
+                      value: String(c.id),
+                      label: c.name,
+                      sub: code,
+                      haystack: `${c.name} ${code}`,
+                    };
+                  })}
+                />
+              </FieldRow>
+            </div>
+            <div className="col-span-12 lg:col-span-6">
+              <div className="flex items-stretch border border-slate-300 h-full">
+                <button
+                  type="button"
+                  onClick={() => setStmtOpen(true)}
+                  disabled={!customerId}
+                  className="bg-cyan-100 hover:bg-cyan-200 text-slate-800 text-[12px] font-semibold px-3 border-l border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shrink-0"
+                  title="کەشف حسابی کڕیار"
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  کەشف حساب
+                </button>
                 <select
                   value={searchPrev}
                   onChange={(e) => setSearchPrev(e.target.value)}
-                  className="flex-1 px-2 py-1 bg-transparent border-0 outline-none text-sm"
+                  className="flex-1 px-2 py-1 bg-white border-0 outline-none text-sm border-l border-slate-300"
                 >
-                  <option value="">— پسووڵە —</option>
+                  <option value="">— پسوولە —</option>
                   {(customerInvoices.length ? customerInvoices : allInvoices ?? []).map((inv: { id: number; invoiceNumber: string; invoiceDate: string }) => (
                     <option key={inv.id} value={inv.id}>
                       #{inv.invoiceNumber} — {inv.invoiceDate}
@@ -394,14 +445,28 @@ export default function SalesNew() {
                   type="button"
                   onClick={openPrevInvoice}
                   disabled={!searchPrev}
-                  className="px-2 border-r border-slate-300 bg-slate-50 hover:bg-slate-100 disabled:opacity-40"
-                  title="کردنەوەی پسووڵە"
+                  className="bg-cyan-100 hover:bg-cyan-200 text-slate-800 text-[12px] font-semibold px-3 border-r border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shrink-0"
+                  title="گەڕان بەپێی ژ.وەسڵ"
                 >
                   <FolderOpen className="h-3.5 w-3.5" />
+                  گەڕان بەپێی ژ.وەسڵ
                 </button>
               </div>
-            </FieldRow>
+            </div>
           </div>
+
+          {/* Row 4: تێبینی (full width) */}
+          <FieldRow label="تێبینی" labelWidth="w-20" alignTop>
+            <AutoTextarea
+              value={notes}
+              readOnly={editLocked}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="تێبینی..."
+              minRows={1}
+              maxRows={3}
+              className="read-only:cursor-not-allowed text-sm"
+            />
+          </FieldRow>
         </div>
 
         {/* === MAIN ITEMS GRID === */}
@@ -410,37 +475,21 @@ export default function SalesNew() {
             <table className="w-full text-sm border-collapse">
               <thead>
                 {/* Headers in DOM order (RTL renders first → rightmost):
-                    گروپ | بارکۆد | ناوی مواد | دانە | نرخ | کۆی گشتی | بەروار | ژ.وەسڵ | × */}
+                    ناوی/اسم المواد | عدد فی بالێت | عدد بالێت | جمع طابوق | السعر | جمع کل | تاریخ الحمل | × */}
                 <tr className="bg-amber-50 text-slate-800 text-[12px]">
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[8%]">گروپ</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">بارکۆد</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[24%]">ناوی مواد</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[8%]">دانە</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">نرخ</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[14%]">کۆی گشتی</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">بەروار</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[8%]">ژ.وەسڵ</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[24%]">ناوی/اسم المواد</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">عدد فی بالێت</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">عدد بالێت</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">جمع طابوق</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">السعر</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[14%]">جمع کل</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[14%]">تاریخ الحمل</th>
                   <th className="border border-slate-400 px-1 py-1.5 font-bold w-9"></th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 align-middle">
-                    {/* گروپ */}
-                    <td className="border border-slate-400 px-2 py-1 text-center text-xs text-slate-600 bg-slate-50">
-                      {item.group || "—"}
-                    </td>
-                    {/* بارکۆد */}
-                    <td className="border border-slate-400 p-0">
-                      <input
-                        value={item.barcode}
-                        readOnly={editLocked}
-                        onChange={(e) => updateItem(idx, "barcode", e.target.value)}
-                        className="w-full px-2 py-1 bg-transparent border-0 outline-none text-center font-mono text-xs read-only:cursor-not-allowed"
-                        dir="ltr"
-                        placeholder="—"
-                      />
-                    </td>
                     {/* ناوی مواد */}
                     <td className="border border-slate-400 p-0">
                       <select
@@ -455,18 +504,33 @@ export default function SalesNew() {
                         ))}
                       </select>
                     </td>
-                    {/* دانە */}
+                    {/* عدد فی بالێت */}
                     <td className="border border-slate-400 p-0">
                       <input
                         type="number"
-                        value={item.quantity ?? ""}
+                        value={item.bricksPerPallet ?? ""}
                         readOnly={editLocked}
-                        onChange={(e) => updateItem(idx, "quantity", e.target.value ? Number(e.target.value) : null)}
+                        onChange={(e) => updateItem(idx, "bricksPerPallet", e.target.value ? Number(e.target.value) : null)}
                         className="w-full px-2 py-1 bg-transparent border-0 outline-none text-center tabular-nums text-blue-700 font-semibold read-only:cursor-not-allowed"
                         placeholder="0"
                       />
                     </td>
-                    {/* نرخ */}
+                    {/* عدد بالێت */}
+                    <td className="border border-slate-400 p-0">
+                      <input
+                        type="number"
+                        value={item.pallets ?? ""}
+                        readOnly={editLocked}
+                        onChange={(e) => updateItem(idx, "pallets", e.target.value ? Number(e.target.value) : null)}
+                        className="w-full px-2 py-1 bg-transparent border-0 outline-none text-center tabular-nums text-blue-700 font-semibold read-only:cursor-not-allowed"
+                        placeholder="0"
+                      />
+                    </td>
+                    {/* جمع طابوق */}
+                    <td className="border border-slate-400 px-2 py-1 text-center tabular-nums font-bold text-slate-700 bg-slate-50">
+                      {itemBricks(item) ? itemBricks(item).toLocaleString("en-US") : "—"}
+                    </td>
+                    {/* السعر */}
                     <td className="border border-slate-400 p-0">
                       <input
                         type="number"
@@ -478,11 +542,11 @@ export default function SalesNew() {
                         dir="ltr"
                       />
                     </td>
-                    {/* کۆی گشتی */}
+                    {/* جمع کل */}
                     <td className="border border-slate-400 px-2 py-1 text-right tabular-nums font-bold text-slate-900 bg-slate-50" dir="ltr">
                       {lineTotal(item) ? lineTotal(item).toLocaleString("en-US") : "0"}
                     </td>
-                    {/* بەروار */}
+                    {/* تاریخ الحمل */}
                     <td className="border border-slate-400 p-0">
                       <input
                         type="date"
@@ -493,10 +557,6 @@ export default function SalesNew() {
                         dir="ltr"
                       />
                     </td>
-                    {/* ژ.وەسڵ */}
-                    <td className="border border-slate-400 px-2 py-1 text-center font-mono text-xs text-slate-600 bg-slate-50" dir="ltr">
-                      {nextInvoiceNo}
-                    </td>
                     {/* delete */}
                     <td className="border border-slate-400 p-0 text-center">
                       <button
@@ -505,8 +565,8 @@ export default function SalesNew() {
                           const hasData =
                             !!item.materialName ||
                             !!item.materialId ||
-                            !!item.barcode ||
-                            (item.quantity ?? 0) > 0 ||
+                            (item.pallets ?? 0) > 0 ||
+                            (item.bricksPerPallet ?? 0) > 0 ||
                             item.unitPrice > 0;
                           if (hasData) setPendingDeleteIdx(idx);
                           else removeRow(idx);
@@ -525,30 +585,52 @@ export default function SalesNew() {
           </div>
         </div>
 
-        {/* === BOTTOM-LEFT FINANCIAL TOTALS (6 stacked rows) === */}
+        {/* === BOTTOM-LEFT FINANCIAL TOTALS (9 stacked rows) === */}
         <div className="px-2 pb-2 grid grid-cols-12 gap-2">
-          <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-1">
-            <StatRow label="کۆی گشتی" value={formatMoney(subtotal)} />
-            <StatRow label="قەرزی کۆن" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} />
-            <StatRow label="پارەدان" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" />
-            <StatRow label="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} />
-            <StatRow label="قەرزی ماوە" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} />
-            <StatRow label="کۆی دانە" value={totalQuantity.toLocaleString("en-US")} />
+          <div className="col-span-12 md:col-span-6 lg:col-span-5 space-y-1">
+            <StatRow labelKu="کۆی گشتی" labelAr="جمع کل" value={formatMoney(subtotal)} suffix="د.ع" />
+            <StatRow labelKu="قەرزی کۆن" labelAr="الدین" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} />
+            <StatRow labelKu="پارەدان" labelAr="الواصلات" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" />
+            {/* Red banner — visual cue for the discount section */}
+            <div className="border border-red-300 bg-red-50 text-red-700 text-[11px] font-bold py-1 px-2 flex justify-between items-center">
+              <span>% = دوای داشکاندن</span>
+              <span>کۆی گشتی</span>
+            </div>
+            <StatRow labelKu="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} />
+            <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" />
+            <StatRow labelKu="قەرزی ماوە" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" />
+            <StatRow labelKu="کۆی بالێت" value={totalPallets.toLocaleString("en-US")} />
+            <StatRow labelKu="کۆی خشت" value={totalBricks.toLocaleString("en-US")} />
           </div>
 
-          {/* Customer ledger summary on the right side of the totals */}
-          <div className="col-span-12 md:col-span-7 lg:col-span-8">
-            <CustomerLedgerSummary
-              customerId={customerId ? Number(customerId) : null}
-              currentInvoiceTotal={totalAfterDiscount}
-              currentPayment={paidAmount}
-            />
+          {/* Right side — empty space below table for layout balance */}
+          <div className="hidden md:block md:col-span-6 lg:col-span-7"></div>
+        </div>
+
+        {/* === BOTTOM TOTALS BAR (4 summary boxes spanning full width) === */}
+        <div className="px-2 pb-2 grid grid-cols-12 gap-2">
+          {/* Left side: 3 stacked summary rows */}
+          <div className="col-span-12 lg:col-span-7 space-y-1">
+            <StatRow labelKu="فرۆش" labelAr="جمع کل المبیعات" value={formatMoney(subtotal)} suffix="د.ع" labelClassName="bg-violet-100" />
+            <StatRow labelKu="پارەدان" labelAr="جمع کل الواصلات" value={formatMoney(paidAmount)} suffix="د.ع" labelClassName="bg-emerald-100" />
+            <StatRow labelKu="فەرز" labelAr="باقی الحساب" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" labelClassName="bg-amber-100" />
+          </div>
+          {/* Right side: single big total */}
+          <div className="col-span-12 lg:col-span-5">
+            <div className="flex items-stretch border border-slate-300 h-full min-h-[92px]">
+              <div className="w-44 bg-violet-100 text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 text-right">
+                کۆی ئەم پسوولە / جمع الکل الفاتورە
+              </div>
+              <div className="flex-1 bg-white px-3 flex items-center justify-between" dir="ltr">
+                <span className="text-2xl font-extrabold text-slate-900 tabular-nums">{formatMoney(totalAfterDiscount)}</span>
+                <span className="text-sm text-slate-500">د.ع</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* === BOTTOM ACTION TOOLBAR === */}
         <div className="border-t border-slate-400 bg-slate-50 px-2 py-1.5 flex flex-wrap items-center gap-1.5 justify-center">
-          {/* Right→left visual order in RTL: Add | Refresh | Nav | Big Receipt | Open | Close | Statement */}
           <Button
             type="button"
             onClick={addRow}
@@ -590,21 +672,17 @@ export default function SalesNew() {
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-1 shadow-sm h-8 px-3"
             title="پاشەکەوت + کردنەوە بە شێوەی وەسڵی A4 بۆ چاپ"
           >
-            <Printer className="h-4 w-4" /> وەسڵ - گەورە
+            <Printer className="h-4 w-4" /> وەسڵی گەورە A4
           </Button>
 
           <Button
             type="button"
-            onClick={() => setEditLocked((v) => !v)}
-            className={`${
-              editLocked
-                ? "bg-pink-400 hover:bg-pink-500 text-red-900 border border-red-700"
-                : "bg-emerald-500 hover:bg-emerald-600 text-white border border-emerald-800"
-            } font-bold gap-1 shadow-sm h-8 px-3`}
-            title={editLocked ? "کردنەوە بۆ دەستکاری" : "داخستنی دەستکاری"}
+            onClick={() => { if (searchPrev) navigate(`/sales/${searchPrev}`); }}
+            disabled={!searchPrev}
+            className="bg-sky-500 hover:bg-sky-600 text-white font-bold gap-1 shadow-sm h-8 px-3"
+            title="بینینی پسوولەی هەڵبژێردراو"
           >
-            {editLocked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
-            کردنەوە
+            <Eye className="h-4 w-4" /> بینینی پسوولە
           </Button>
 
           <Button
@@ -625,12 +703,28 @@ export default function SalesNew() {
             <FileText className="h-4 w-4" /> کەشف حسابی کڕیار
           </Button>
 
-          {/* Save button — kept separate as primary action */}
+          <Button
+            type="button"
+            onClick={() => setEditLocked((v) => !v)}
+            className={`${
+              editLocked
+                ? "bg-pink-400 hover:bg-pink-500 text-red-900 border border-red-700"
+                : "bg-emerald-500 hover:bg-emerald-600 text-white border border-emerald-800"
+            } font-bold gap-1 shadow-sm h-8 px-3`}
+            title={editLocked ? "کردنەوە بۆ دەستکاری" : "داخستنی دەستکاری"}
+          >
+            {editLocked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
+            کردنەوە
+          </Button>
+        </div>
+
+        {/* Save button — full width, primary action */}
+        <div className="border-t border-slate-300 bg-slate-100 px-2 py-1.5">
           <Button
             type="button"
             onClick={handleSubmit}
             disabled={editLocked || creating || !customerId}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold gap-1 shadow-sm h-8 px-3 min-w-[100px]"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-sm h-9"
             title={editLocked ? "بۆ پاشەکەوت، کردنەوە دابگرە" : "پاشەکەوت"}
           >
             <Save className="h-4 w-4" /> {creating ? "تۆمارکردن..." : "پاشەکەوت"}
@@ -658,11 +752,14 @@ export default function SalesNew() {
               {items[pendingDeleteIdx].materialName?.trim() || "— بێ ناو —"}
             </div>
             <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap" dir="ltr">
-              {(items[pendingDeleteIdx].quantity ?? 0) > 0 && (
-                <span>دانە: <span className="tabular-nums font-semibold">{(items[pendingDeleteIdx].quantity ?? 0).toLocaleString("en-US")}</span></span>
+              {(items[pendingDeleteIdx].pallets ?? 0) > 0 && (
+                <span>بالێت: <span className="tabular-nums font-semibold">{(items[pendingDeleteIdx].pallets ?? 0).toLocaleString("en-US")}</span></span>
+              )}
+              {(items[pendingDeleteIdx].bricksPerPallet ?? 0) > 0 && (
+                <><span className="text-slate-300">•</span><span>عدد فی بالێت: <span className="tabular-nums font-semibold">{(items[pendingDeleteIdx].bricksPerPallet ?? 0).toLocaleString("en-US")}</span></span></>
               )}
               {items[pendingDeleteIdx].unitPrice > 0 && (
-                <><span className="text-slate-300">•</span><span>نرخ: <span className="tabular-nums font-semibold">{items[pendingDeleteIdx].unitPrice.toLocaleString("en-US")}</span></span></>
+                <><span className="text-slate-300">•</span><span>السعر: <span className="tabular-nums font-semibold">{items[pendingDeleteIdx].unitPrice.toLocaleString("en-US")}</span></span></>
               )}
               {lineTotal(items[pendingDeleteIdx]) > 0 && (
                 <><span className="text-slate-300">•</span><span>کۆ: <span className="tabular-nums font-bold text-rose-700">{lineTotal(items[pendingDeleteIdx]).toLocaleString("en-US")}</span></span></>
