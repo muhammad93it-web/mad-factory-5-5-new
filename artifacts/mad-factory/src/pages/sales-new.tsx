@@ -36,8 +36,8 @@ import {
 type InvoiceItem = {
   materialId: number | null;
   materialName: string;
-  bricksPerPallet: number | null;   // عدد فی بالێت
-  pallets: number | null;            // عدد بالێت
+  bricksPerPallet: number | null;   // عدد فی بالیت
+  pallets: number | null;            // عدد بالیت
   unitPrice: number;                 // السعر
   itemDate: string;                  // تاریخ الحمل
 };
@@ -330,7 +330,7 @@ export default function SalesNew() {
           quantity: itemBricks(i),
           unitPrice: i.unitPrice,
           totalBricks: itemBricks(i),
-          notes: `بالێت: ${i.pallets} × ${i.bricksPerPallet}`,
+          notes: `بالیت: ${i.pallets} × ${i.bricksPerPallet}`,
         })),
       },
     });
@@ -482,11 +482,11 @@ export default function SalesNew() {
             <table className="w-full text-sm border-collapse">
               <thead>
                 {/* Headers in DOM order (RTL renders first → rightmost):
-                    ناوی/اسم المواد | عدد فی بالێت | عدد بالێت | جمع طابوق | السعر | جمع کل | تاریخ الحمل | × */}
+                    ناوی/اسم المواد | عدد فی بالیت | عدد بالیت | جمع طابوق | السعر | جمع کل | تاریخ الحمل | × */}
                 <tr className="bg-amber-50 text-slate-800 text-[12px]">
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[24%]">ناوی/اسم المواد</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">عدد بالێت</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">عدد فی بالێت</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">عدد بالیت</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">عدد فی بالیت</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">جمع طابوق</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">السعر</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[14%]">جمع کل</th>
@@ -511,7 +511,7 @@ export default function SalesNew() {
                         ))}
                       </select>
                     </td>
-                    {/* عدد بالێت */}
+                    {/* عدد بالیت */}
                     <td className="border border-slate-400 p-0">
                       <input
                         type="number"
@@ -522,7 +522,7 @@ export default function SalesNew() {
                         placeholder="0"
                       />
                     </td>
-                    {/* عدد فی بالێت */}
+                    {/* عدد فی بالیت */}
                     <td className="border border-slate-400 p-0">
                       <input
                         type="number"
@@ -618,7 +618,7 @@ export default function SalesNew() {
             <StatRow labelKu="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} labelWidth="w-32" />
             <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" valueClassName="bg-amber-50" labelWidth="w-32" />
             <StatRow labelKu="قەرزی ماوە" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" labelWidth="w-32" />
-            <StatRow labelKu="کۆی بالێت" value={totalPallets.toLocaleString("en-US")} labelWidth="w-32" />
+            <StatRow labelKu="کۆی بالیت" value={totalPallets.toLocaleString("en-US")} labelWidth="w-32" />
             <StatRow labelKu="کۆی خشت" value={totalBricks.toLocaleString("en-US")} labelWidth="w-32" />
           </div>
         </div>
@@ -769,10 +769,10 @@ export default function SalesNew() {
             </div>
             <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap" dir="ltr">
               {(items[pendingDeleteIdx].pallets ?? 0) > 0 && (
-                <span>بالێت: <span className="tabular-nums font-semibold">{(items[pendingDeleteIdx].pallets ?? 0).toLocaleString("en-US")}</span></span>
+                <span>بالیت: <span className="tabular-nums font-semibold">{(items[pendingDeleteIdx].pallets ?? 0).toLocaleString("en-US")}</span></span>
               )}
               {(items[pendingDeleteIdx].bricksPerPallet ?? 0) > 0 && (
-                <><span className="text-slate-300">•</span><span>عدد فی بالێت: <span className="tabular-nums font-semibold">{(items[pendingDeleteIdx].bricksPerPallet ?? 0).toLocaleString("en-US")}</span></span></>
+                <><span className="text-slate-300">•</span><span>عدد فی بالیت: <span className="tabular-nums font-semibold">{(items[pendingDeleteIdx].bricksPerPallet ?? 0).toLocaleString("en-US")}</span></span></>
               )}
               {items[pendingDeleteIdx].unitPrice > 0 && (
                 <><span className="text-slate-300">•</span><span>السعر: <span className="tabular-nums font-semibold">{items[pendingDeleteIdx].unitPrice.toLocaleString("en-US")}</span></span></>

@@ -50,7 +50,7 @@ const ITEM_TYPE_OPTIONS: { value: ItemType; label: string; cls: string }[] = [
   { value: "sell", label: "فرۆشتن", cls: "text-emerald-700" },
 ];
 
-const UNIT_OPTIONS = ["", "بالێت", "خشتە", "کیلۆ", "تۆن", "دانە", "کارتۆن", "لیتر", "مەتر"];
+const UNIT_OPTIONS = ["", "بالیت", "خشتە", "کیلۆ", "تۆن", "دانە", "کارتۆن", "لیتر", "مەتر"];
 
 export default function Materials() {
   const queryClient = useQueryClient();
@@ -318,7 +318,7 @@ export default function Materials() {
                 <th className="border border-slate-500 px-2 py-2 font-bold w-[11%]">نرخی کرین</th>
                 <th className="border border-slate-500 px-2 py-2 font-bold w-[10%]">قازانج</th>
                 <th className="border border-slate-500 px-2 py-2 font-bold w-[11%]">نرخی فرۆشتن</th>
-                <th className="border border-slate-500 px-2 py-2 font-bold w-[10%]">دانەی بالێت</th>
+                <th className="border border-slate-500 px-2 py-2 font-bold w-[10%]">دانەی بالیت</th>
                 <th className="border border-slate-500 px-2 py-2 font-bold w-[8%]">یەکە</th>
                 <th className="border border-slate-500 px-2 py-2 font-bold w-[10%]">جۆر</th>
                 <th className="border border-slate-500 px-2 py-2 font-bold w-[8%]">FK</th>
