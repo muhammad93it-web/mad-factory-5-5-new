@@ -1,0 +1,73 @@
+ئەم دیزاینە شێوازێکی زۆر باو و سەرکەوتووی سیستەمە ژمێریارییەکانە، کە بەشێوەیەکی کلاسیک و چڕ (Desktop-style) ڕێکخراوە و هەموو زانیارییەکان لە یەک شاشەدا کۆدەکاتەوە. لەبەر ئەوەی پڕۆژەکەی تۆ لەسەر وێبە (Web-based)، دەبێت بە کۆدی زیرەکی دەستکردەکە بڵێین کە بە بەکارهێنانی CSS ئەم شێوازە کلاسیکییە بۆ وێب دروست بکاتەوە بەبێ ئەوەی هیچ لابدات لە دیزاینەکە.
+
+تێبینییەکی بچووک: لەبەر ئەوەی وێنەکە بۆ بەشی (کڕین)ـە، لە پرۆمپتەکەدا تەنها وشەی "ناوی فرۆشیار"م گۆڕیوە بۆ "ناوی کڕیار" چونکە تۆ دەتەوێت ئەمە بۆ بەشی فرۆشتن جێبەجێ بکەیت.
+
+فەرموو ئەمەش پرۆمپتێکی زۆر توند و ورد بۆ جێبەجێکردنی ئەم دیزاینە بەتەواوی:
+
+پرۆمپتەکە (بۆ کۆپیکردن)
+CRITICAL UI/UX RESTRUCTURING: EXACT VISUAL REPLICATION REQUIRED
+
+Please completely redesign the "Sales" (فرۆشتن) form to exactly replicate the layout, structure, and logic of a classic desktop point-of-sale interface, adapted perfectly for our web-based system using CSS Grid/Flexbox. Do not deviate from the layout described below.
+
+1. Global Layout & Theme:
+
+Use a compact, data-dense desktop application style.
+
+Background: Light gray. Headers/Borders: Distinct, structured lines.
+
+2. Top Header Information Section (3 Columns - Right to Left Logic):
+Create a top section divided into three distinct blocks:
+
+Right Block (Vertically stacked): >   1. Receipt Number (ژمارەی وەسڵ) - Auto-generated (e.g., 'جديد').
+2. Date (بەروار) - Auto-filled current date/time.
+3. Buyer Name (ناوی کڕیار) - Searchable dropdown.
+
+Middle Block (Vertically stacked):
+
+Mobile (مۆبایل) - Auto-filled based on buyer.
+
+Address (ناونیشان) - Auto-filled based on buyer.
+
+Notes (تێبینی).
+
+Left Block:
+
+Search by Receipt No. (گەڕان بە پێی ژمارەی وەسڵ) - Include a dropdown/input combo exactly at the top left.
+
+3. Main Data Grid (Exact Columns - Right to Left):
+The invoice items table must have the following exact headers from Right to Left:
+Group (گروپ) | Barcode (بارکۆد) | Item Name (ناوی مواد) - Dropdown | Quantity (دانە) | Price (نرخ) | Total (کۆی گشتی) | Date (بەروار) | Receipt No. (ژ.وەسڵ).
+
+4. Bottom Left Section (Financial Totals):
+Strictly align these 6 calculation fields in a vertical stack on the bottom left of the screen:
+
+Grand Total (کۆی گشتی)
+
+Old Debt (قەرزی کۆن)
+
+Payment (پارەدان) - Editable input.
+
+Discount (داشکاندن) - Editable input.
+
+Remaining Debt (قەرزی ماوە) - Auto-calculated.
+
+Total Item Quantity (کۆی دانە).
+
+5. Bottom Action Toolbar:
+Create a fixed toolbar at the absolute bottom of the screen containing these buttons (arranged conceptually from right to left):
+
+Add (زیاد کردن)
+
+Refresh (ڕیفرێش)
+
+Record Navigation Arrows (Next, Previous, First, Last) [▶, ▶|, ◀, |◀]
+
+Large Receipt (وەسڵ - گەورە)
+
+Open (کردنەوە)
+
+Close (داخستن)
+
+Buyer Account Statement (کەشف حسابی کڕیار).
+
+Make sure the CSS strictly mimics this exact compact desktop-style layout. Do not add unnecessary modern white-space or large paddings that break this dense grid structure.
