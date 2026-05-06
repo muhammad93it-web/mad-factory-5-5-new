@@ -342,8 +342,8 @@ export default function Payroll() {
               <Field label="مووچەی ڕۆژانە" value={emp.salary} onChange={(v) => setEmp({ ...emp, salary: v })} mono inputMode="numeric" />
             </div>
 
-            {/* Search inputs (green labels) — pushed to bottom */}
-            <div className="mt-auto pt-3 flex flex-col gap-1">
+            {/* Search inputs (green labels) — small fixed gap from form */}
+            <div className="mt-4 flex flex-col gap-1">
               <SearchField label="گەڕان بە پێی ناو" value={searchName} onChange={setSearchName} options={employees.map((e) => e.name)} />
               <SearchField label="گەڕان بە پێی کۆد" value={searchCode} onChange={setSearchCode} options={employees.map((e) => e.code)} />
               <SearchField label="گەڕان بە پێی ژمارە" value={searchNumber} onChange={setSearchNumber} options={employees.map((_e, i) => String(i + 1))} />
