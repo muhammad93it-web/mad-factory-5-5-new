@@ -57,11 +57,6 @@ const EMPTY_EMP: EmpForm = {
   salary: "",
 };
 
-const KU_MONTHS = [
-  "کانوونی دووەم", "شوبات", "ئادار", "نیسان", "ئایار", "حوزەیران",
-  "تەمموز", "ئاب", "ئەیلوول", "تشرینی یەکەم", "تشرینی دووەم", "کانوونی یەکەم",
-];
-
 export default function Payroll() {
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
@@ -217,19 +212,20 @@ export default function Payroll() {
   const fmt = (n: number) => new Intl.NumberFormat("en-US").format(Math.round(n));
 
   return (
-    <div className="-m-4 md:-m-6" dir="rtl">
+    <div className="-m-4 md:-m-6 h-screen flex flex-col overflow-hidden text-[12px]" dir="rtl" lang="en-US">
       {/* HEADER */}
-      <div className="bg-[#7030a0] text-white py-2.5 text-center">
-        <h1 className="text-2xl font-bold tracking-widest" style={{ letterSpacing: "0.4em" }}>مووچەی کرێکاران</h1>
+      <div className="bg-[#7030a0] text-white py-1.5 text-center shrink-0">
+        <h1 className="text-xl font-bold tracking-widest" style={{ letterSpacing: "0.4em" }}>مووچەی کرێکاران</h1>
       </div>
 
       {/* TOP TABS */}
-      <div className="bg-slate-50 border-y border-slate-300 px-2 py-1.5 flex flex-row-reverse flex-wrap gap-1.5">
+      <div className="bg-slate-50 border-y border-slate-300 px-1.5 py-1 flex flex-row-reverse flex-wrap gap-1 shrink-0">
         <input
           value={searchNumber}
           onChange={(e) => setSearchNumber(e.target.value)}
           inputMode="numeric"
-          className="border border-slate-400 bg-white rounded-sm px-2 py-1 text-sm w-24 text-center"
+          lang="en-US"
+          className="border border-slate-400 bg-white rounded-sm px-1.5 py-0.5 text-[12px] w-20 text-center font-mono"
           placeholder="ژمارە"
         />
         <button onClick={() => setActiveTab("g1")} className={tabCls(activeTab === "g1")}>ڕاپۆرتی گشتی 1</button>
@@ -242,11 +238,11 @@ export default function Payroll() {
       </div>
 
       {/* MAIN BODY */}
-      <div className="p-1.5 grid grid-cols-12 gap-2 bg-slate-100 min-h-[calc(100vh-180px)] pb-24">
+      <div className="p-1 grid grid-cols-12 gap-1.5 bg-slate-100 flex-1 min-h-0 overflow-hidden">
         {/* LEFT PANEL: Salary grid (~70%) — order-2 in RTL grid puts it on the LEFT */}
-        <div className="col-span-12 lg:col-span-8 order-2 flex flex-col gap-2">
-          {/* Data grid */}
-          <div className="bg-white border border-slate-400 overflow-auto flex-1">
+        <div className="col-span-12 lg:col-span-8 order-2 flex flex-col gap-1 min-h-0">
+          {/* Data grid - only this scrolls */}
+          <div className="bg-white border border-slate-400 overflow-y-auto flex-1 min-h-0">
             <table className="w-full text-sm border-collapse" dir="rtl">
               <thead>
                 <tr className="bg-[#92d050] text-slate-900">
@@ -270,10 +266,9 @@ export default function Payroll() {
                   const [yyyy, mm] = (e.period || "").split("-");
                   const days = Number(e.workDays) || 0;
                   const dailyRate = days > 0 ? Number(e.baseSalary) / days : Number(e.baseSalary);
-                  const monthName = mm ? KU_MONTHS[Number(mm) - 1] || mm : "";
                   return (
                     <tr key={e.id} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                      <Td center mono>{monthName}</Td>
+                      <Td center mono>{e.period}</Td>
                       <Td center mono>{yyyy}</Td>
                       <Td center mono>{Number(mm)}</Td>
                       <Td center mono>{days}</Td>
@@ -299,14 +294,14 @@ export default function Payroll() {
           </div>
 
           {/* Totals row - aligned right under last 3 data columns */}
-          <div className="flex justify-start gap-2 mt-2 mb-2" dir="rtl">
-            <div className="border border-slate-400 bg-white px-3 py-1.5 text-center font-mono font-semibold min-w-[110px]">{fmt(totals.totalDue)}</div>
-            <div className="border border-slate-400 bg-white px-3 py-1.5 text-center font-mono font-semibold text-blue-600 min-w-[110px]">{fmt(totals.paid)}</div>
-            <div className="border border-slate-400 bg-white px-3 py-1.5 text-center font-mono font-semibold text-emerald-700 min-w-[110px]">{fmt(totals.remaining)}</div>
+          <div className="flex justify-start gap-1.5 shrink-0" dir="rtl">
+            <div className="border border-slate-400 bg-white px-2 py-1 text-center font-mono font-semibold min-w-[90px] text-[12px]">{fmt(totals.totalDue)}</div>
+            <div className="border border-slate-400 bg-white px-2 py-1 text-center font-mono font-semibold text-blue-600 min-w-[90px] text-[12px]">{fmt(totals.paid)}</div>
+            <div className="border border-slate-400 bg-white px-2 py-1 text-center font-mono font-semibold text-emerald-700 min-w-[90px] text-[12px]">{fmt(totals.remaining)}</div>
           </div>
 
           {/* Action row - separate distinct div, flows naturally below totals */}
-          <div className="flex items-center gap-2 flex-wrap mt-1">
+          <div className="flex items-center gap-1.5 flex-wrap shrink-0">
             <div className="flex items-center gap-0.5">
               <NavBtn onClick={() => goNav("last")}><ChevronsLeft className="h-4 w-4" /></NavBtn>
               <NavBtn onClick={() => goNav("next")}><ChevronLeft className="h-4 w-4" /></NavBtn>
@@ -316,19 +311,19 @@ export default function Payroll() {
             <button
               onClick={() => { setShowAddMonth(true); setNewMonth({ year: today.getFullYear(), month: today.getMonth() + 1, workDays: "1", dailyRate: emp.salary, received: "0", notes: "" }); }}
               disabled={!emp.id}
-              className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 border border-slate-400 rounded-sm text-sm disabled:opacity-50 flex items-center gap-1"
+              className="px-2 py-1 bg-slate-200 hover:bg-slate-300 border border-slate-400 rounded-sm text-[12px] disabled:opacity-50 flex items-center gap-1"
             >
-              <Plus className="h-4 w-4" /> زیادکردنی موچە
+              <Plus className="h-3 w-3" /> زیادکردنی موچە
             </button>
-            <button className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 border border-slate-400 rounded-sm text-sm">
+            <button className="px-2 py-1 bg-slate-200 hover:bg-slate-300 border border-slate-400 rounded-sm text-[12px]">
               گۆڕینی مانگی(13)بۆ (1)
             </button>
           </div>
         </div>
 
         {/* RIGHT PANEL: Employee details (~30%) — order-1 in RTL grid puts it on the RIGHT */}
-        <div className="col-span-12 lg:col-span-4 order-1">
-          <div className="bg-white border border-slate-400 p-2 space-y-1">
+        <div className="col-span-12 lg:col-span-4 order-1 overflow-y-auto min-h-0">
+          <div className="bg-white border border-slate-400 p-1.5 space-y-0.5">
             <Field label="ژمارە" value={navIdx >= 0 ? String(navIdx + 1) : ""} readOnly mono />
             <Field label="ناوی سیانی" value={emp.name} onChange={(v) => setEmp({ ...emp, name: v })} />
             <Field label="کۆد" value={emp.code} onChange={(v) => setEmp({ ...emp, code: v })} mono />
@@ -341,11 +336,11 @@ export default function Payroll() {
             <Field label="شوێنی نیشتەجێبوون" value={emp.address} onChange={(v) => setEmp({ ...emp, address: v })} />
             <Field label="ئاستی خوێندەواری" value={emp.educationLevel} onChange={(v) => setEmp({ ...emp, educationLevel: v })} />
             <Field label="بەرواری دەستبەکار بوون" value={emp.hireDate} onChange={(v) => setEmp({ ...emp, hireDate: v })} type="date" mono />
-            <Field label="ساڵی لە دایکبوون" value={emp.birthYear} onChange={(v) => setEmp({ ...emp, birthYear: v })} mono />
+            <Field label="ساڵی لە دایکبوون" value={emp.birthYear} onChange={(v) => setEmp({ ...emp, birthYear: v })} type="date" mono />
             <Field label="مووچەی ڕۆژانە" value={emp.salary} onChange={(v) => setEmp({ ...emp, salary: v })} mono inputMode="numeric" />
 
             {/* Search inputs (green labels) */}
-            <div className="pt-2 space-y-1">
+            <div className="pt-1.5 space-y-0.5">
               <SearchField label="گەڕان بە پێی ناو" value={searchName} onChange={setSearchName} options={employees.map((e) => e.name)} />
               <SearchField label="گەڕان بە پێی کۆد" value={searchCode} onChange={setSearchCode} options={employees.map((e) => e.code)} />
               <SearchField label="گەڕان بە پێی ژمارە" value={searchNumber} onChange={setSearchNumber} options={employees.map((_e, i) => String(i + 1))} />
@@ -355,7 +350,7 @@ export default function Payroll() {
       </div>
 
       {/* BOTTOM BAR */}
-      <div className="bg-[#7030a0] text-white px-3 py-2 flex items-center justify-between gap-3 sticky bottom-0">
+      <div className="bg-[#7030a0] text-white px-2 py-1.5 flex items-center justify-between gap-2 shrink-0">
         <button
           onClick={handleClear}
           className="bg-white text-red-600 px-3 py-1 text-sm rounded-sm font-semibold hover:bg-red-50"
@@ -394,7 +389,7 @@ export default function Payroll() {
               <div className="flex items-center gap-2">
                 <label className="bg-[#d8f4f9] border border-slate-400 px-2 py-1 text-sm w-32 text-right">مانگ</label>
                 <select value={newMonth.month} onChange={(e) => setNewMonth({ ...newMonth, month: Number(e.target.value) })} className="border border-slate-400 px-2 py-1 text-sm flex-1">
-                  {KU_MONTHS.map((m, i) => <option key={i} value={i + 1}>{i + 1} - {m}</option>)}
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
               <ModalField label="ڕۆژانی کارکردن" value={newMonth.workDays} onChange={(v) => setNewMonth({ ...newMonth, workDays: v })} />
@@ -421,10 +416,10 @@ function tabCls(active: boolean) {
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="border border-slate-400 px-2 py-1.5 text-center text-sm font-semibold whitespace-nowrap">{children}</th>;
+  return <th className="border border-slate-400 px-1.5 py-1 text-center text-[12px] font-semibold whitespace-nowrap sticky top-0 bg-[#92d050] z-10">{children}</th>;
 }
 function Td({ children, center, mono, className }: { children: React.ReactNode; center?: boolean; mono?: boolean; className?: string }) {
-  return <td className={`border border-slate-300 px-2 py-1 text-sm ${center ? "text-center" : ""} ${mono ? "font-mono tabular-nums" : ""} ${className ?? ""}`}>{children}</td>;
+  return <td className={`border border-slate-300 px-1 py-0.5 text-[12px] ${center ? "text-center" : ""} ${mono ? "font-mono tabular-nums" : ""} ${className ?? ""}`} lang="en-US">{children}</td>;
 }
 function NavBtn({ children, onClick, orange }: { children: React.ReactNode; onClick: () => void; orange?: boolean }) {
   return (
@@ -449,8 +444,8 @@ function Field({
   inputMode?: "numeric" | "text";
 }) {
   return (
-    <div className="flex items-center gap-1">
-      <label className="bg-[#d8f4f9] border border-slate-400 px-2 py-1 text-sm w-36 text-right shrink-0">{label}</label>
+    <div className="flex items-center gap-0.5">
+      <label className="bg-[#d8f4f9] border border-slate-400 px-1.5 py-0.5 text-[12px] w-32 text-right shrink-0">{label}</label>
       {dropdown ? (
         <>
           <input
@@ -458,7 +453,8 @@ function Field({
             value={value}
             onChange={(e) => onChange?.(e.target.value)}
             readOnly={readOnly}
-            className={`border border-slate-400 px-2 py-1 text-sm flex-1 min-w-0 ${mono ? "font-mono" : ""}`}
+            lang="en-US"
+            className={`border border-slate-400 px-1.5 py-0.5 text-[12px] flex-1 min-w-0 ${mono ? "font-mono" : ""}`}
             dir={dir}
           />
           <datalist id={`dl-${label}`}>
@@ -472,8 +468,9 @@ function Field({
           onChange={(e) => onChange?.(e.target.value)}
           readOnly={readOnly}
           inputMode={inputMode}
-          dir={dir}
-          className={`border border-slate-400 px-2 py-1 text-sm flex-1 min-w-0 ${mono ? "font-mono tabular-nums" : ""} ${readOnly ? "bg-slate-50" : "bg-white"}`}
+          dir={type === "date" ? "ltr" : dir}
+          lang="en-US"
+          className={`border border-slate-400 px-1.5 py-0.5 text-[12px] flex-1 min-w-0 ${mono ? "font-mono tabular-nums" : ""} ${readOnly ? "bg-slate-50" : "bg-white"}`}
         />
       )}
     </div>
@@ -482,13 +479,14 @@ function Field({
 
 function SearchField({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: string[] }) {
   return (
-    <div className="flex items-center gap-1">
-      <label className="bg-[#a9d18e] border border-slate-400 px-2 py-1 text-sm w-36 text-right shrink-0">{label}</label>
+    <div className="flex items-center gap-0.5">
+      <label className="bg-[#a9d18e] border border-slate-400 px-1.5 py-0.5 text-[12px] w-32 text-right shrink-0">{label}</label>
       <input
         list={`sdl-${label}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border border-slate-400 px-2 py-1 text-sm flex-1 min-w-0 bg-white"
+        lang="en-US"
+        className="border border-slate-400 px-1.5 py-0.5 text-[12px] flex-1 min-w-0 bg-white"
       />
       <datalist id={`sdl-${label}`}>
         {options.map((o, i) => <option key={`${o}-${i}`} value={o} />)}
@@ -500,8 +498,8 @@ function SearchField({ label, value, onChange, options }: { label: string; value
 function ModalField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div className="flex items-center gap-2">
-      <label className="bg-[#d8f4f9] border border-slate-400 px-2 py-1 text-sm w-32 text-right shrink-0">{label}</label>
-      <input value={value} onChange={(e) => onChange(e.target.value)} className="border border-slate-400 px-2 py-1 text-sm flex-1 min-w-0" />
+      <label className="bg-[#d8f4f9] border border-slate-400 px-2 py-1 text-[12px] w-32 text-right shrink-0">{label}</label>
+      <input value={value} onChange={(e) => onChange(e.target.value)} lang="en-US" className="border border-slate-400 px-2 py-1 text-[12px] flex-1 min-w-0" />
     </div>
   );
 }
