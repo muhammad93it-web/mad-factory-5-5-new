@@ -85,7 +85,7 @@ function PlainInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
 // Bilingual stat row used in the bottom-left totals stack.
 // Right column = bilingual label (Kurdish/Arabic), left = value with optional د.ع suffix.
 function StatRow({
-  labelKu, labelAr, value, accent, editable, onChange, readOnly, suffix, labelClassName,
+  labelKu, labelAr, value, accent, editable, onChange, readOnly, suffix, labelClassName, valueClassName, labelWidth,
 }: {
   labelKu: string;
   labelAr?: string;
@@ -96,6 +96,8 @@ function StatRow({
   readOnly?: boolean;
   suffix?: string;
   labelClassName?: string;
+  valueClassName?: string;
+  labelWidth?: string;
 }) {
   const valueColor =
     accent === "warn"
@@ -105,27 +107,27 @@ function StatRow({
         : "text-slate-900";
   return (
     <div className="flex items-stretch border border-slate-300 min-h-[28px]">
-      <div className={`w-44 text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 shrink-0 ${labelClassName ?? "bg-cyan-100"}`}>
+      <div className={`${labelWidth ?? "w-44"} text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 shrink-0 ${labelClassName ?? "bg-cyan-100"}`}>
         <span className="truncate">
           {labelKu}
           {labelAr ? <span className="text-slate-500 font-normal"> / {labelAr}</span> : null}
         </span>
       </div>
       {editable ? (
-        <div className="flex-1 flex items-stretch">
+        <div className={`flex-1 flex items-stretch ${valueClassName ?? "bg-white"}`}>
           <input
             type="number"
             value={(value as number) || ""}
             readOnly={readOnly}
             onChange={(e) => onChange?.(Number(e.target.value))}
-            className={`flex-1 px-2 py-1 bg-white text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed min-w-0`}
+            className={`flex-1 px-2 py-1 bg-transparent text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed min-w-0`}
             placeholder="0"
             dir="ltr"
           />
-          {suffix ? <span className="px-2 flex items-center text-[11px] text-slate-500 bg-white">{suffix}</span> : null}
+          {suffix ? <span className="px-2 flex items-center text-[11px] text-slate-500">{suffix}</span> : null}
         </div>
       ) : (
-        <div className={`flex-1 bg-white px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor} flex items-center justify-between`} dir="ltr">
+        <div className={`flex-1 px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor} flex items-center justify-between ${valueClassName ?? "bg-white"}`} dir="ltr">
           <span className="truncate">{value}</span>
           {suffix ? <span className="text-[11px] text-slate-500 ms-2 shrink-0">{suffix}</span> : null}
         </div>
@@ -591,13 +593,17 @@ export default function SalesNew() {
             <StatRow labelKu="کۆی گشتی" labelAr="جمع کل" value={formatMoney(subtotal)} suffix="د.ع" />
             <StatRow labelKu="قەرزی کۆن" labelAr="الدین" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} />
             <StatRow labelKu="پارەدان" labelAr="الواصلات" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" />
-            {/* Red banner — visual cue for the discount section */}
-            <div className="border border-red-300 bg-red-50 text-red-700 text-[11px] font-bold py-1 px-2 flex justify-between items-center">
-              <span>% = دوای داشکاندن</span>
-              <span>کۆی گشتی</span>
+            {/* Red banner split into two cells — visual cue for the discount section */}
+            <div className="flex items-stretch border border-red-300 min-h-[24px]">
+              <div className="w-44 bg-white text-red-700 text-[11px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0">
+                % = دوای داشکاندن
+              </div>
+              <div className="flex-1 bg-white text-red-700 text-[11px] font-bold flex items-center justify-start px-2">
+                کۆی گشتی
+              </div>
             </div>
             <StatRow labelKu="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} />
-            <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" />
+            <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" valueClassName="bg-amber-50" />
             <StatRow labelKu="قەرزی ماوە" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" />
             <StatRow labelKu="کۆی بالێت" value={totalPallets.toLocaleString("en-US")} />
             <StatRow labelKu="کۆی خشت" value={totalBricks.toLocaleString("en-US")} />
@@ -609,19 +615,19 @@ export default function SalesNew() {
 
         {/* === BOTTOM TOTALS BAR (4 summary boxes spanning full width) === */}
         <div className="px-2 pb-2 grid grid-cols-12 gap-2">
-          {/* Left side: 3 stacked summary rows */}
+          {/* Left side: 3 stacked summary rows with wide colored labels */}
           <div className="col-span-12 lg:col-span-7 space-y-1">
-            <StatRow labelKu="فرۆش" labelAr="جمع کل المبیعات" value={formatMoney(subtotal)} suffix="د.ع" labelClassName="bg-violet-100" />
-            <StatRow labelKu="پارەدان" labelAr="جمع کل الواصلات" value={formatMoney(paidAmount)} suffix="د.ع" labelClassName="bg-emerald-100" />
-            <StatRow labelKu="فەرز" labelAr="باقی الحساب" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" labelClassName="bg-amber-100" />
+            <StatRow labelKu="فرۆش" labelAr="جمع کل المبیعات" value={formatMoney(subtotal)} suffix="د.ع" labelClassName="bg-violet-200" labelWidth="flex-1" />
+            <StatRow labelKu="پارەدان" labelAr="جمع کل الواصلات" value={formatMoney(paidAmount)} suffix="د.ع" labelClassName="bg-emerald-200" labelWidth="flex-1" />
+            <StatRow labelKu="فەرز" labelAr="باقی الحساب" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" labelClassName="bg-amber-200" labelWidth="flex-1" />
           </div>
           {/* Right side: single big total */}
           <div className="col-span-12 lg:col-span-5">
             <div className="flex items-stretch border border-slate-300 h-full min-h-[92px]">
-              <div className="w-44 bg-violet-100 text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 text-right">
+              <div className="flex-1 bg-violet-200 text-slate-800 text-[13px] font-semibold flex items-center justify-end px-3 border-l border-slate-300 text-right">
                 کۆی ئەم پسوولە / جمع الکل الفاتورە
               </div>
-              <div className="flex-1 bg-white px-3 flex items-center justify-between" dir="ltr">
+              <div className="w-40 bg-white px-3 flex items-center justify-between" dir="ltr">
                 <span className="text-2xl font-extrabold text-slate-900 tabular-nums">{formatMoney(totalAfterDiscount)}</span>
                 <span className="text-sm text-slate-500">د.ع</span>
               </div>
