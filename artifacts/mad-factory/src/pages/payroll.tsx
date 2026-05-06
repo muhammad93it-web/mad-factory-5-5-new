@@ -323,9 +323,9 @@ export default function Payroll() {
 
         {/* RIGHT PANEL: Employee details (~30%) — order-1 in RTL grid puts it on the RIGHT */}
         <div className="col-span-12 lg:col-span-4 order-1 min-h-0 flex flex-col">
-          <div className="bg-white border border-slate-400 p-2 flex flex-col flex-1 min-h-0 overflow-y-auto">
+          <div className="bg-white border border-slate-400 p-1.5 flex flex-col flex-1 min-h-0 overflow-hidden">
             {/* Top section: employee details */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-[2px]">
               <Field label="ژمارە" value={navIdx >= 0 ? String(navIdx + 1) : ""} readOnly mono />
               <Field label="ناوی سیانی" value={emp.name} onChange={(v) => setEmp({ ...emp, name: v })} />
               <Field label="کۆد" value={emp.code} onChange={(v) => setEmp({ ...emp, code: v })} mono />
@@ -343,7 +343,7 @@ export default function Payroll() {
             </div>
 
             {/* Search inputs (green labels) — small fixed gap from form */}
-            <div className="mt-4 flex flex-col gap-1">
+            <div className="mt-2 flex flex-col gap-[2px]">
               <SearchField label="گەڕان بە پێی ناو" value={searchName} onChange={setSearchName} options={employees.map((e) => e.name)} />
               <SearchField label="گەڕان بە پێی کۆد" value={searchCode} onChange={setSearchCode} options={employees.map((e) => e.code)} />
               <SearchField label="گەڕان بە پێی ژمارە" value={searchNumber} onChange={setSearchNumber} options={employees.map((_e, i) => String(i + 1))} />
@@ -448,7 +448,7 @@ function Field({
 }) {
   return (
     <div className="flex items-center gap-0.5">
-      <label className="bg-[#d8f4f9] border border-slate-400 px-1.5 py-0.5 text-[12px] w-32 text-right shrink-0">{label}</label>
+      <label className="bg-[#d8f4f9] border border-slate-400 px-1 leading-tight text-[11px] w-32 text-right shrink-0 h-[20px] flex items-center justify-end">{label}</label>
       {dropdown ? (
         <>
           <input
@@ -457,7 +457,7 @@ function Field({
             onChange={(e) => onChange?.(e.target.value)}
             readOnly={readOnly}
             lang="en-US"
-            className={`border border-slate-400 px-1.5 py-0.5 text-[12px] flex-1 min-w-0 ${mono ? "font-mono" : ""}`}
+            className={`border border-slate-400 px-1 text-[11px] leading-tight h-[20px] flex-1 min-w-0 ${mono ? "font-mono" : ""}`}
             dir={dir}
           />
           <datalist id={`dl-${label}`}>
@@ -473,7 +473,7 @@ function Field({
           inputMode={inputMode}
           dir={type === "date" ? "ltr" : dir}
           lang="en-US"
-          className={`border border-slate-400 px-1.5 py-0.5 text-[12px] flex-1 min-w-0 ${mono ? "font-mono tabular-nums" : ""} ${readOnly ? "bg-slate-50" : "bg-white"}`}
+          className={`border border-slate-400 px-1 text-[11px] leading-tight h-[20px] flex-1 min-w-0 ${mono ? "font-mono tabular-nums" : ""} ${readOnly ? "bg-slate-50" : "bg-white"}`}
         />
       )}
     </div>
@@ -483,13 +483,13 @@ function Field({
 function SearchField({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: string[] }) {
   return (
     <div className="flex items-center gap-0.5">
-      <label className="bg-[#a9d18e] border border-slate-400 px-1.5 py-0.5 text-[12px] w-32 text-right shrink-0">{label}</label>
+      <label className="bg-[#a9d18e] border border-slate-400 px-1 leading-tight text-[11px] w-32 text-right shrink-0 h-[20px] flex items-center justify-end">{label}</label>
       <input
         list={`sdl-${label}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         lang="en-US"
-        className="border border-slate-400 px-1.5 py-0.5 text-[12px] flex-1 min-w-0 bg-white"
+        className="border border-slate-400 px-1 text-[11px] leading-tight h-[20px] flex-1 min-w-0 bg-white"
       />
       <datalist id={`sdl-${label}`}>
         {options.map((o, i) => <option key={`${o}-${i}`} value={o} />)}
