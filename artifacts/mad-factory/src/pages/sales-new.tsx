@@ -471,9 +471,10 @@ export default function SalesNew() {
           </FieldRow>
         </div>
 
-        {/* === MAIN ITEMS GRID === */}
-        <div className="px-2 py-2 border-b border-slate-300">
-          <div className="border border-slate-400 bg-white overflow-x-auto">
+        {/* === MIDDLE SECTION: side-by-side table (75%) + calc panel (25%) === */}
+        <div className="px-2 py-2 border-b border-slate-300 grid grid-cols-1 lg:grid-cols-4 gap-2">
+          {/* RIGHT (in RTL = first): items table — 75% / 3 cols of 4 */}
+          <div className="lg:col-span-3 order-1 border border-slate-400 bg-white overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
                 {/* Headers in DOM order (RTL renders first → rightmost):
@@ -585,14 +586,12 @@ export default function SalesNew() {
               </tbody>
             </table>
           </div>
-        </div>
 
-        {/* === BOTTOM-LEFT FINANCIAL TOTALS (9 stacked rows) === */}
-        <div className="px-2 pb-2 grid grid-cols-12 gap-2">
-          <div className="col-span-12 md:col-span-6 lg:col-span-5 space-y-1">
-            <StatRow labelKu="کۆی گشتی" labelAr="جمع کل" value={formatMoney(subtotal)} suffix="د.ع" />
-            <StatRow labelKu="قەرزی کۆن" labelAr="الدین" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} />
-            <StatRow labelKu="پارەدان" labelAr="الواصلات" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" />
+          {/* LEFT (in RTL = last): calc panel — 25% / 1 col of 4 */}
+          <div className="lg:col-span-1 order-2 space-y-1">
+            <StatRow labelKu="کۆی گشتی" labelAr="جمع کل" value={formatMoney(subtotal)} suffix="د.ع" labelWidth="w-32" />
+            <StatRow labelKu="قەرزی کۆن" labelAr="الدین" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} labelWidth="w-32" />
+            <StatRow labelKu="پارەدان" labelAr="الواصلات" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" labelWidth="w-32" />
             {/* Quick-pay buttons: pay-after-discount | pay-full-subtotal */}
             <div className="flex items-stretch border border-red-300 min-h-[26px]">
               <button
@@ -600,7 +599,7 @@ export default function SalesNew() {
                 onClick={() => setPaidAmount(totalAfterDiscount)}
                 disabled={editLocked}
                 title="پارەدانی تەواو دوای داشکاندن"
-                className="w-44 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[11px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0 transition-colors"
+                className="w-32 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[10px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0 transition-colors"
               >
                 % = دوای داشکاندن
               </button>
@@ -609,20 +608,17 @@ export default function SalesNew() {
                 onClick={() => setPaidAmount(subtotal)}
                 disabled={editLocked}
                 title="پارەدانی تەواو بێ داشکاندن"
-                className="flex-1 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[11px] font-bold flex items-center justify-start px-2 transition-colors"
+                className="flex-1 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[10px] font-bold flex items-center justify-start px-2 transition-colors"
               >
                 کۆی گشتی
               </button>
             </div>
-            <StatRow labelKu="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} />
-            <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" valueClassName="bg-amber-50" />
-            <StatRow labelKu="قەرزی ماوە" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" />
-            <StatRow labelKu="کۆی بالێت" value={totalPallets.toLocaleString("en-US")} />
-            <StatRow labelKu="کۆی خشت" value={totalBricks.toLocaleString("en-US")} />
+            <StatRow labelKu="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} labelWidth="w-32" />
+            <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" valueClassName="bg-amber-50" labelWidth="w-32" />
+            <StatRow labelKu="قەرزی ماوە" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix="د.ع" labelWidth="w-32" />
+            <StatRow labelKu="کۆی بالێت" value={totalPallets.toLocaleString("en-US")} labelWidth="w-32" />
+            <StatRow labelKu="کۆی خشت" value={totalBricks.toLocaleString("en-US")} labelWidth="w-32" />
           </div>
-
-          {/* Right side — empty space below table for layout balance */}
-          <div className="hidden md:block md:col-span-6 lg:col-span-7"></div>
         </div>
 
         {/* === BOTTOM TOTALS BAR (4 summary boxes spanning full width) === */}
