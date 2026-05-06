@@ -43,6 +43,13 @@ export function PinConfirmModal({ open, title, message, itemSummary, onCancel, o
     return () => clearTimeout(t);
   }, [stage]);
 
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: Event) => { e.preventDefault(); onCancel(); };
+    window.addEventListener("app:back-request", handler);
+    return () => window.removeEventListener("app:back-request", handler);
+  }, [open, onCancel]);
+
   if (!open) return null;
 
   const submitPin = async () => {

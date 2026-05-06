@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,13 @@ export function QuickAddParty({ kind, onCreated, buttonLabel, buttonClassName, b
     setAddress("");
     setOpeningBalance(0);
   };
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: Event) => { e.preventDefault(); setOpen(false); };
+    window.addEventListener("app:back-request", handler);
+    return () => window.removeEventListener("app:back-request", handler);
+  }, [open]);
 
   const handleSuccess = (created: { id: number }) => {
     queryClient.invalidateQueries({

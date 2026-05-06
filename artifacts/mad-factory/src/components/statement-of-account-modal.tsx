@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -46,6 +46,13 @@ export function StatementOfAccountModal({ open, onClose, kind, entityId }: Props
   const [, navigate] = useLocation();
   const idNum = entityId ?? 0;
   const enabled = open && !!entityId;
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: Event) => { e.preventDefault(); onClose(); };
+    window.addEventListener("app:back-request", handler);
+    return () => window.removeEventListener("app:back-request", handler);
+  }, [open, onClose]);
 
   // Customer-side hooks (always called; gated by `enabled`)
   const { data: customer } = useGetCustomer(idNum, {
