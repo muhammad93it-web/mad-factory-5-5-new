@@ -484,8 +484,8 @@ export default function SalesNew() {
                     ناوی/اسم المواد | عدد فی بالێت | عدد بالێت | جمع طابوق | السعر | جمع کل | تاریخ الحمل | × */}
                 <tr className="bg-amber-50 text-slate-800 text-[12px]">
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[24%]">ناوی/اسم المواد</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">عدد فی بالێت</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">عدد بالێت</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">عدد فی بالێت</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">جمع طابوق</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">السعر</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[14%]">جمع کل</th>
@@ -510,17 +510,6 @@ export default function SalesNew() {
                         ))}
                       </select>
                     </td>
-                    {/* عدد فی بالێت */}
-                    <td className="border border-slate-400 p-0">
-                      <input
-                        type="number"
-                        value={item.bricksPerPallet ?? ""}
-                        readOnly={editLocked}
-                        onChange={(e) => updateItem(idx, "bricksPerPallet", e.target.value ? Number(e.target.value) : null)}
-                        className="w-full px-2 py-1 bg-transparent border-0 outline-none text-center tabular-nums text-blue-700 font-semibold read-only:cursor-not-allowed"
-                        placeholder="0"
-                      />
-                    </td>
                     {/* عدد بالێت */}
                     <td className="border border-slate-400 p-0">
                       <input
@@ -528,6 +517,17 @@ export default function SalesNew() {
                         value={item.pallets ?? ""}
                         readOnly={editLocked}
                         onChange={(e) => updateItem(idx, "pallets", e.target.value ? Number(e.target.value) : null)}
+                        className="w-full px-2 py-1 bg-transparent border-0 outline-none text-center tabular-nums text-blue-700 font-semibold read-only:cursor-not-allowed"
+                        placeholder="0"
+                      />
+                    </td>
+                    {/* عدد فی بالێت */}
+                    <td className="border border-slate-400 p-0">
+                      <input
+                        type="number"
+                        value={item.bricksPerPallet ?? ""}
+                        readOnly={editLocked}
+                        onChange={(e) => updateItem(idx, "bricksPerPallet", e.target.value ? Number(e.target.value) : null)}
                         className="w-full px-2 py-1 bg-transparent border-0 outline-none text-center tabular-nums text-blue-700 font-semibold read-only:cursor-not-allowed"
                         placeholder="0"
                       />
