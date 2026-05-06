@@ -1,0 +1,28 @@
+ئۆهـ، بەتەواوی تێگەیشتم مەبەستت چییە! کێشەکە ئەوەیە کاتێک پێمان وت شاشەکە "قنج" بکەرەوە بۆ ئەوەی سکڕۆڵ نەبێت، زیرەکی دەستکردەکە هەموو خانەکانی لای ڕاستی پاڵناوە بۆ ئەوپەڕی سەرەوە، بەمەش ئەو بۆشاییە گەورە و ناشرینەی لە خوارەوە دروست کردووە.
+
+ئەگەر سەیری دیزاینە ئەسڵییەکە بکەین، خانەکانی گەڕان (گەڕان بەپێی ناو، کۆد، ژمارە) دەبێت بکەونە خوارەوەی شاشەکە ڕێک لەسەر شریتە مۆرەکە، وە بۆشاییەکە بکەوێتە نێوان زانیارییەکانی سەرەوە و خانەکانی گەڕان.
+
+بە پێدانی ئەم پرۆمپتەی خوارەوە لەگەڵ وێنەکەدا، ڕاستەوخۆ خانەکانی گەڕان فڕێ دەداتە خوارەوە و ئەو بەینە زۆرە پڕ دەکاتەوە:
+
+پرۆمپتی نەهێشتنی بۆشایی لای ڕاست (بۆ کۆپیکردن)
+CRITICAL LAYOUT FIX: DISTRIBUTE RIGHT PANEL VERTICAL SPACE
+
+Look at the attached image with the drawn arrows. The Right Panel (Employee Form) is completely squished at the very top, leaving a massive, awkward empty void at the bottom above the purple footer.
+
+Please apply these specific CSS fixes to the RIGHT PANEL to match the layout of the original desktop UI:
+
+1. Push Search Fields to the Bottom:
+
+Ensure the Right Panel container is a flex column: display: flex; flex-direction: column; height: 100%;
+
+Wrap the 3 Search inputs (گه‌ڕان بە پێی ناو, گه‌ڕان بە پێی كۆد, گه‌ڕان بە پێی ژمارە) inside their own separate div wrapper.
+
+Crucial Step: Apply margin-top: auto; to this new Search wrapper. This will automatically push the search fields to the absolute bottom of the Right Panel (right above the purple footer), perfectly removing that massive empty gap.
+
+2. Even Out Form Spacing:
+
+Slightly increase the vertical gap (e.g., gap: 6px; or 8px;) between the standard Employee Details inputs in the top section of the Right Panel so they breathe a little better and aren't entirely clumped together.
+
+3. Left Panel Table Stretch (Match Heights):
+
+Ensure the Left Panel's Table wrapper has flex-grow: 1;. The table body itself should take up the available vertical space. This ensures the Totals (1,040,000) sit neatly aligned near the bottom horizontally with the search fields on the right.

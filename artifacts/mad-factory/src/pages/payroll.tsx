@@ -241,8 +241,8 @@ export default function Payroll() {
       <div className="p-1 grid grid-cols-12 gap-1.5 bg-slate-100 flex-1 min-h-0 overflow-hidden">
         {/* LEFT PANEL: Salary grid (~70%) — order-2 in RTL grid puts it on the LEFT */}
         <div className="col-span-12 lg:col-span-8 order-2 flex flex-col justify-start gap-1 min-h-0">
-          {/* Data grid - sizes to content; scrolls only if rows exceed available space */}
-          <div className="overflow-y-auto min-h-0" style={{ maxHeight: "calc(100% - 80px)" }}>
+          {/* Data grid - grows to fill available space, scrolls internally */}
+          <div className="overflow-y-auto flex-1 min-h-0">
             <table className="w-full text-sm border-collapse bg-white border border-slate-400" dir="rtl">
               <thead>
                 <tr className="bg-[#92d050] text-slate-900">
@@ -322,25 +322,28 @@ export default function Payroll() {
         </div>
 
         {/* RIGHT PANEL: Employee details (~30%) — order-1 in RTL grid puts it on the RIGHT */}
-        <div className="col-span-12 lg:col-span-4 order-1 overflow-y-auto min-h-0">
-          <div className="bg-white border border-slate-400 p-1.5 space-y-0.5">
-            <Field label="ژمارە" value={navIdx >= 0 ? String(navIdx + 1) : ""} readOnly mono />
-            <Field label="ناوی سیانی" value={emp.name} onChange={(v) => setEmp({ ...emp, name: v })} />
-            <Field label="کۆد" value={emp.code} onChange={(v) => setEmp({ ...emp, code: v })} mono />
-            <Field label="جۆری کار" value={emp.role} onChange={(v) => setEmp({ ...emp, role: v })} dropdown options={["مەندوب", "کارگەر", "ئاژۆ", "بەرپرس", "تر"]} />
-            <Field label="مۆبایل" value={emp.phone} onChange={(v) => setEmp({ ...emp, phone: v })} dir="ltr" mono />
-            <Field label="مۆبایل 2" value={emp.phone2} onChange={(v) => setEmp({ ...emp, phone2: v })} dir="ltr" mono />
-            <Field label="مۆبایل 3" value={emp.phone3} onChange={(v) => setEmp({ ...emp, phone3: v })} dir="ltr" mono />
-            <Field label="تێبینی" value={emp.notes} onChange={(v) => setEmp({ ...emp, notes: v })} />
-            <Field label="شوێنی لە دایک بوون" value={emp.birthPlace} onChange={(v) => setEmp({ ...emp, birthPlace: v })} />
-            <Field label="شوێنی نیشتەجێبوون" value={emp.address} onChange={(v) => setEmp({ ...emp, address: v })} />
-            <Field label="ئاستی خوێندەواری" value={emp.educationLevel} onChange={(v) => setEmp({ ...emp, educationLevel: v })} />
-            <Field label="بەرواری دەستبەکار بوون" value={emp.hireDate} onChange={(v) => setEmp({ ...emp, hireDate: v })} type="date" mono />
-            <Field label="ساڵی لە دایکبوون" value={emp.birthYear} onChange={(v) => setEmp({ ...emp, birthYear: v })} type="date" mono />
-            <Field label="مووچەی ڕۆژانە" value={emp.salary} onChange={(v) => setEmp({ ...emp, salary: v })} mono inputMode="numeric" />
+        <div className="col-span-12 lg:col-span-4 order-1 min-h-0 flex flex-col">
+          <div className="bg-white border border-slate-400 p-2 flex flex-col flex-1 min-h-0 overflow-y-auto">
+            {/* Top section: employee details */}
+            <div className="flex flex-col gap-1.5">
+              <Field label="ژمارە" value={navIdx >= 0 ? String(navIdx + 1) : ""} readOnly mono />
+              <Field label="ناوی سیانی" value={emp.name} onChange={(v) => setEmp({ ...emp, name: v })} />
+              <Field label="کۆد" value={emp.code} onChange={(v) => setEmp({ ...emp, code: v })} mono />
+              <Field label="جۆری کار" value={emp.role} onChange={(v) => setEmp({ ...emp, role: v })} dropdown options={["مەندوب", "کارگەر", "ئاژۆ", "بەرپرس", "تر"]} />
+              <Field label="مۆبایل" value={emp.phone} onChange={(v) => setEmp({ ...emp, phone: v })} dir="ltr" mono />
+              <Field label="مۆبایل 2" value={emp.phone2} onChange={(v) => setEmp({ ...emp, phone2: v })} dir="ltr" mono />
+              <Field label="مۆبایل 3" value={emp.phone3} onChange={(v) => setEmp({ ...emp, phone3: v })} dir="ltr" mono />
+              <Field label="تێبینی" value={emp.notes} onChange={(v) => setEmp({ ...emp, notes: v })} />
+              <Field label="شوێنی لە دایک بوون" value={emp.birthPlace} onChange={(v) => setEmp({ ...emp, birthPlace: v })} />
+              <Field label="شوێنی نیشتەجێبوون" value={emp.address} onChange={(v) => setEmp({ ...emp, address: v })} />
+              <Field label="ئاستی خوێندەواری" value={emp.educationLevel} onChange={(v) => setEmp({ ...emp, educationLevel: v })} />
+              <Field label="بەرواری دەستبەکار بوون" value={emp.hireDate} onChange={(v) => setEmp({ ...emp, hireDate: v })} type="date" mono />
+              <Field label="ساڵی لە دایکبوون" value={emp.birthYear} onChange={(v) => setEmp({ ...emp, birthYear: v })} type="date" mono />
+              <Field label="مووچەی ڕۆژانە" value={emp.salary} onChange={(v) => setEmp({ ...emp, salary: v })} mono inputMode="numeric" />
+            </div>
 
-            {/* Search inputs (green labels) */}
-            <div className="pt-1.5 space-y-0.5">
+            {/* Search inputs (green labels) — pushed to bottom */}
+            <div className="mt-auto pt-3 flex flex-col gap-1">
               <SearchField label="گەڕان بە پێی ناو" value={searchName} onChange={setSearchName} options={employees.map((e) => e.name)} />
               <SearchField label="گەڕان بە پێی کۆد" value={searchCode} onChange={setSearchCode} options={employees.map((e) => e.code)} />
               <SearchField label="گەڕان بە پێی ژمارە" value={searchNumber} onChange={setSearchNumber} options={employees.map((_e, i) => String(i + 1))} />
