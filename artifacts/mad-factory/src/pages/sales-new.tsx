@@ -593,14 +593,26 @@ export default function SalesNew() {
             <StatRow labelKu="کۆی گشتی" labelAr="جمع کل" value={formatMoney(subtotal)} suffix="د.ع" />
             <StatRow labelKu="قەرزی کۆن" labelAr="الدین" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} />
             <StatRow labelKu="پارەدان" labelAr="الواصلات" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" />
-            {/* Red banner split into two cells — visual cue for the discount section */}
-            <div className="flex items-stretch border border-red-300 min-h-[24px]">
-              <div className="w-44 bg-white text-red-700 text-[11px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0">
+            {/* Quick-pay buttons: pay-after-discount | pay-full-subtotal */}
+            <div className="flex items-stretch border border-red-300 min-h-[26px]">
+              <button
+                type="button"
+                onClick={() => setPaidAmount(totalAfterDiscount)}
+                disabled={editLocked}
+                title="پارەدانی تەواو دوای داشکاندن"
+                className="w-44 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[11px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0 transition-colors"
+              >
                 % = دوای داشکاندن
-              </div>
-              <div className="flex-1 bg-white text-red-700 text-[11px] font-bold flex items-center justify-start px-2">
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaidAmount(subtotal)}
+                disabled={editLocked}
+                title="پارەدانی تەواو بێ داشکاندن"
+                className="flex-1 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[11px] font-bold flex items-center justify-start px-2 transition-colors"
+              >
                 کۆی گشتی
-              </div>
+              </button>
             </div>
             <StatRow labelKu="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} />
             <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" valueClassName="bg-amber-50" />
