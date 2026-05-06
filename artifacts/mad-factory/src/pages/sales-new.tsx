@@ -215,12 +215,15 @@ export default function SalesNew() {
           if (value === null) {
             return { ...item, materialId: null, materialName: "" };
           }
-          const mat = materials?.find((m: { id: number }) => m.id === Number(value));
+          const mat = materials?.find((m: { id: number }) => m.id === Number(value)) as
+            | { id: number; name: string; salePrice?: number | null; purchasePrice: number; bricksPerPallet?: number | null }
+            | undefined;
           return {
             ...item,
             materialId: mat?.id ?? null,
             materialName: mat?.name ?? item.materialName,
-            unitPrice: mat ? Number((mat as { salePrice?: number | null; purchasePrice: number }).salePrice ?? mat.purchasePrice) : item.unitPrice,
+            unitPrice: mat ? Number(mat.salePrice ?? mat.purchasePrice) : item.unitPrice,
+            bricksPerPallet: mat?.bricksPerPallet ?? item.bricksPerPallet,
           };
         }
         return { ...item, [field]: value };
