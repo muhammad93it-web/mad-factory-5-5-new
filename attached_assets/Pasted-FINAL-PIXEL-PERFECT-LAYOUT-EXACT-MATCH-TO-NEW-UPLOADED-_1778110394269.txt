@@ -1,0 +1,43 @@
+FINAL PIXEL-PERFECT LAYOUT: EXACT MATCH TO NEW UPLOADED IMAGE
+
+I have uploaded a new, perfect reference image. The UI must look EXACTLY like this. Notice the scrollbars! Both the right form panel and the left table panel have their own independent vertical scrollbars. This is the key to making it fit perfectly on one screen.
+
+You MUST implement this EXACT CSS Flexbox architecture immediately:
+
+1. Main Page Wrapper (No Global Scroll):
+
+height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+
+2. Middle Content Area (The Split Screen):
+
+display: flex; flex-direction: row; flex-grow: 1; overflow: hidden; gap: 10px; padding: 10px;
+
+Ensure direction: rtl; is applied.
+
+3. Right Panel (Form - ~30% Width):
+
+width: 30%; display: flex; flex-direction: column; overflow-y: auto; padding-left: 5px;
+
+(This is why there is a scrollbar on the right in the image. It lets the form fields scroll independently).
+
+Space the inputs naturally. The 3 search fields (Green background labels) sit at the bottom of this scrolling container.
+
+4. Left Panel (Table & Totals - ~70% Width):
+
+width: 70%; display: flex; flex-direction: column; overflow: hidden;
+
+Table Wrapper (Inside Left Panel): flex-grow: 1; overflow-y: auto; border: 1px solid #ccc; (This gives the table its own independent scrollbar).
+
+Totals & Action Buttons (Below Table Wrapper): flex-shrink: 0; margin-top: 10px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
+
+(This ensures the three total boxes 0, 0, 0 and the small pagination/add buttons are always visible, locked tightly right under the scrolling table).
+
+5. Fixed Purple Footer:
+
+flex-shrink: 0; width: 100%; background: #7030a0; display: flex; justify-content: space-between; align-items: center; padding: 5px 10px;
+
+Right side of footer: پاککردنەوە (White button, red text).
+
+Left side of footer: زیادکردنی ناو, the 4 orange arrows, and ڕیفرێش.
+
+Action: Rebuild the CSS explicitly using these overflow-y and flex-grow rules so the layout perfectly matches the provided screenshot without breaking.

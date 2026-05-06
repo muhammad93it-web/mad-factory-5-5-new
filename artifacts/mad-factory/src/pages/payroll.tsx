@@ -238,7 +238,7 @@ export default function Payroll() {
       </div>
 
       {/* MAIN BODY */}
-      <div className="p-1 grid grid-cols-12 gap-1.5 bg-slate-100 flex-1 min-h-0 overflow-hidden">
+      <div className="p-2 grid grid-cols-12 gap-2 bg-slate-100 flex-1 min-h-0 overflow-hidden">
         {/* LEFT PANEL: Salary grid (~70%) — order-2 in RTL grid puts it on the LEFT */}
         <div className="col-span-12 lg:col-span-8 order-2 flex flex-col justify-start gap-1 min-h-0">
           {/* Data grid - grows to fill available space, scrolls internally */}
