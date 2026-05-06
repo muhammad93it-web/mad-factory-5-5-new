@@ -2395,7 +2395,15 @@ components:
           type: ["string", "null"]
         phone2:
           type: ["string", "null"]
+        phone3:
+          type: ["string", "null"]
         address:
+          type: ["string", "null"]
+        birthPlace:
+          type: ["string", "null"]
+        educationLevel:
+          type: ["string", "null"]
+        birthYear:
           type: ["string", "null"]
         guarantor:
           type: ["string", "null"]
@@ -2433,7 +2441,15 @@ components:
           type: ["string", "null"]
         phone2:
           type: ["string", "null"]
+        phone3:
+          type: ["string", "null"]
         address:
+          type: ["string", "null"]
+        birthPlace:
+          type: ["string", "null"]
+        educationLevel:
+          type: ["string", "null"]
+        birthYear:
           type: ["string", "null"]
         guarantor:
           type: ["string", "null"]
@@ -2459,7 +2475,15 @@ components:
           type: ["string", "null"]
         phone2:
           type: ["string", "null"]
+        phone3:
+          type: ["string", "null"]
         address:
+          type: ["string", "null"]
+        birthPlace:
+          type: ["string", "null"]
+        educationLevel:
+          type: ["string", "null"]
+        birthYear:
           type: ["string", "null"]
         guarantor:
           type: ["string", "null"]

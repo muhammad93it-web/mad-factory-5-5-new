@@ -487,7 +487,15 @@ export interface Employee {
   /** @nullable */
   phone2?: string | null;
   /** @nullable */
+  phone3?: string | null;
+  /** @nullable */
   address?: string | null;
+  /** @nullable */
+  birthPlace?: string | null;
+  /** @nullable */
+  educationLevel?: string | null;
+  /** @nullable */
+  birthYear?: string | null;
   /** @nullable */
   guarantor?: string | null;
   /** @nullable */
@@ -510,7 +518,15 @@ export interface CreateEmployeeBody {
   /** @nullable */
   phone2?: string | null;
   /** @nullable */
+  phone3?: string | null;
+  /** @nullable */
   address?: string | null;
+  /** @nullable */
+  birthPlace?: string | null;
+  /** @nullable */
+  educationLevel?: string | null;
+  /** @nullable */
+  birthYear?: string | null;
   /** @nullable */
   guarantor?: string | null;
   /** @nullable */
@@ -529,7 +545,15 @@ export interface UpdateEmployeeBody {
   /** @nullable */
   phone2?: string | null;
   /** @nullable */
+  phone3?: string | null;
+  /** @nullable */
   address?: string | null;
+  /** @nullable */
+  birthPlace?: string | null;
+  /** @nullable */
+  educationLevel?: string | null;
+  /** @nullable */
+  birthYear?: string | null;
   /** @nullable */
   guarantor?: string | null;
   /** @nullable */
