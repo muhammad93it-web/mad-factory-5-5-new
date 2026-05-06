@@ -242,9 +242,9 @@ export default function Payroll() {
       </div>
 
       {/* MAIN BODY */}
-      <div className="p-1.5 grid grid-cols-12 gap-2 bg-slate-100 min-h-[calc(100vh-180px)]">
-        {/* LEFT PANEL: Salary grid (~70%) */}
-        <div className="col-span-12 lg:col-span-8 order-2 lg:order-1 flex flex-col gap-2">
+      <div className="p-1.5 grid grid-cols-12 gap-2 bg-slate-100 min-h-[calc(100vh-180px)] pb-24">
+        {/* LEFT PANEL: Salary grid (~70%) — order-2 in RTL grid puts it on the LEFT */}
+        <div className="col-span-12 lg:col-span-8 order-2 flex flex-col gap-2">
           {/* Data grid */}
           <div className="bg-white border border-slate-400 overflow-auto flex-1">
             <table className="w-full text-sm border-collapse" dir="rtl">
@@ -298,17 +298,15 @@ export default function Payroll() {
             </table>
           </div>
 
-          {/* Totals row - aligned under last 3 columns */}
-          <div className="grid grid-cols-9 gap-0 text-sm">
-            <div className="col-span-5"></div>
-            <div className="border border-slate-400 bg-white px-2 py-1.5 text-center font-mono font-semibold">{fmt(totals.totalDue)}</div>
-            <div className="border border-slate-400 bg-white px-2 py-1.5 text-center font-mono font-semibold text-blue-600">{fmt(totals.paid)}</div>
-            <div className="border border-slate-400 bg-white px-2 py-1.5 text-center font-mono font-semibold text-emerald-700">{fmt(totals.remaining)}</div>
-            <div></div>
+          {/* Totals row - aligned right under last 3 data columns */}
+          <div className="flex justify-start gap-2 mt-2 mb-2" dir="rtl">
+            <div className="border border-slate-400 bg-white px-3 py-1.5 text-center font-mono font-semibold min-w-[110px]">{fmt(totals.totalDue)}</div>
+            <div className="border border-slate-400 bg-white px-3 py-1.5 text-center font-mono font-semibold text-blue-600 min-w-[110px]">{fmt(totals.paid)}</div>
+            <div className="border border-slate-400 bg-white px-3 py-1.5 text-center font-mono font-semibold text-emerald-700 min-w-[110px]">{fmt(totals.remaining)}</div>
           </div>
 
-          {/* Action row */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Action row - separate distinct div, flows naturally below totals */}
+          <div className="flex items-center gap-2 flex-wrap mt-1">
             <div className="flex items-center gap-0.5">
               <NavBtn onClick={() => goNav("last")}><ChevronsLeft className="h-4 w-4" /></NavBtn>
               <NavBtn onClick={() => goNav("next")}><ChevronLeft className="h-4 w-4" /></NavBtn>
@@ -328,8 +326,8 @@ export default function Payroll() {
           </div>
         </div>
 
-        {/* RIGHT PANEL: Employee details (~30%) */}
-        <div className="col-span-12 lg:col-span-4 order-1 lg:order-2">
+        {/* RIGHT PANEL: Employee details (~30%) — order-1 in RTL grid puts it on the RIGHT */}
+        <div className="col-span-12 lg:col-span-4 order-1">
           <div className="bg-white border border-slate-400 p-2 space-y-1">
             <Field label="ژمارە" value={navIdx >= 0 ? String(navIdx + 1) : ""} readOnly mono />
             <Field label="ناوی سیانی" value={emp.name} onChange={(v) => setEmp({ ...emp, name: v })} />
