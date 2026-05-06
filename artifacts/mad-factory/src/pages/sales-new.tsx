@@ -599,19 +599,17 @@ export default function SalesNew() {
             <div className="flex items-stretch border border-red-300 min-h-[26px]">
               <button
                 type="button"
-                onClick={() => setPaidAmount(totalAfterDiscount)}
-                disabled={editLocked}
+                onClick={() => setPaidAmount(Math.max(0, totalAfterDiscount))}
                 title="پارەدانی تەواو دوای داشکاندن"
-                className="w-32 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[10px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0 transition-colors"
+                className="w-32 bg-white hover:bg-red-100 active:bg-red-200 text-red-700 text-[10px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0 transition-colors cursor-pointer"
               >
                 % = دوای داشکاندن
               </button>
               <button
                 type="button"
-                onClick={() => setPaidAmount(subtotal)}
-                disabled={editLocked}
+                onClick={() => setPaidAmount(Math.max(0, subtotal))}
                 title="پارەدانی تەواو بێ داشکاندن"
-                className="flex-1 bg-white hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-red-700 text-[10px] font-bold flex items-center justify-start px-2 transition-colors"
+                className="flex-1 bg-white hover:bg-red-100 active:bg-red-200 text-red-700 text-[10px] font-bold flex items-center justify-start px-2 transition-colors cursor-pointer"
               >
                 کۆی گشتی
               </button>
