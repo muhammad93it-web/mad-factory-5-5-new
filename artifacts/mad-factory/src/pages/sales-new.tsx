@@ -106,29 +106,30 @@ function StatRow({
         ? "text-emerald-700"
         : "text-slate-900";
   return (
-    <div className="flex items-stretch border border-slate-300 min-h-[28px]">
-      <div className={`${labelWidth ?? "w-44"} text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 shrink-0 ${labelClassName ?? "bg-cyan-100"}`}>
+    <div className="flex items-stretch border border-slate-300 min-h-[28px] w-full overflow-hidden">
+      <div className={`${labelWidth ?? "w-44"} text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 shrink-0 whitespace-nowrap overflow-hidden ${labelClassName ?? "bg-cyan-100"}`}>
         <span className="truncate">
           {labelKu}
           {labelAr ? <span className="text-slate-500 font-normal"> / {labelAr}</span> : null}
         </span>
       </div>
       {editable ? (
-        <div className={`flex-1 flex items-stretch ${valueClassName ?? "bg-white"}`}>
+        <div className={`flex-1 min-w-0 flex items-stretch ${valueClassName ?? "bg-white"}`}>
           <input
             type="number"
             value={(value as number) || ""}
             readOnly={readOnly}
             onChange={(e) => onChange?.(Number(e.target.value))}
-            className={`flex-1 px-2 py-1 bg-transparent text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed min-w-0`}
+            className={`flex-1 w-0 min-w-0 px-2 py-1 bg-transparent text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed`}
             placeholder="0"
             dir="ltr"
+            style={{ boxSizing: "border-box" }}
           />
-          {suffix ? <span className="px-2 flex items-center text-[11px] text-slate-500">{suffix}</span> : null}
+          {suffix ? <span className="px-2 flex items-center text-[11px] text-slate-500 shrink-0">{suffix}</span> : null}
         </div>
       ) : (
-        <div className={`flex-1 px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor} flex items-center justify-between ${valueClassName ?? "bg-white"}`} dir="ltr">
-          <span className="truncate">{value}</span>
+        <div className={`flex-1 min-w-0 px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor} flex items-center justify-between overflow-hidden ${valueClassName ?? "bg-white"}`} dir="ltr">
+          <span className="truncate min-w-0">{value}</span>
           {suffix ? <span className="text-[11px] text-slate-500 ms-2 shrink-0">{suffix}</span> : null}
         </div>
       )}
