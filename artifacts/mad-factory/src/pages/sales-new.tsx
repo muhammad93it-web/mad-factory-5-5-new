@@ -534,6 +534,26 @@ export default function SalesNew() {
             <StatRow label="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} />
             <StatRow label="قەرزی ماوە" value={formatMoney(remaining)} accent={remaining > 0 ? "warn" : "ok"} />
             <StatRow label="کۆی دانە" value={totalQuantity.toLocaleString("en-US")} />
+            <div className="grid grid-cols-2 gap-1 pt-1">
+              <Button
+                type="button"
+                disabled={editLocked}
+                onClick={() => setPaidAmount(grandTotal)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-8 text-xs shadow-sm"
+                title="پارەدانی تەواوی قەرز (کۆی گشتی + قەرزی کۆن − داشکاندن)"
+              >
+                پارەدانی تەواو
+              </Button>
+              <Button
+                type="button"
+                disabled={editLocked}
+                onClick={() => setPaidAmount(totalAfterDiscount)}
+                className="bg-sky-600 hover:bg-sky-700 text-white font-bold h-8 text-xs shadow-sm"
+                title="تەنها بڕی ئەم وەسڵە دوای داشکاندن (بەبێ قەرزی کۆن)"
+              >
+                پارەدانی دوای داشکاندن
+              </Button>
+            </div>
           </div>
 
           {/* Customer ledger summary on the right side of the totals */}
