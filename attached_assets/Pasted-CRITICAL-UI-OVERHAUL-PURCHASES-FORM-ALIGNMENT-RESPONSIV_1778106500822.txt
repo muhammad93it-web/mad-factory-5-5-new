@@ -1,0 +1,36 @@
+CRITICAL UI OVERHAUL: "PURCHASES" (کڕین) FORM ALIGNMENT & RESPONSIVENESS
+
+I need you to completely restructure the "Purchases" (کڕین) form to match the exact split-screen layout of the "Sales" form, while also optimizing the top header fields for better space management. Please apply the following exact CSS and layout rules:
+
+PART 1: Top Header Optimization (Compact & Dynamic)
+1. Reduce Widths & Group Compactly:
+
+The inputs for "Receipt Number" (ژمارەی وەسڵ), "Mobile" (مۆبایل), "Date" (بەروار), "Address" (ناونیشان), and "Automobile" (ئۆتۆمبێل) take up too much unnecessary horizontal space.
+
+Shrink their widths significantly and align them neatly side-by-side on the same level. Use a tight display: grid or Flexbox to keep them grouped without wasting empty space.
+2. Enlarge the Notes Field:
+
+Allocate significantly more horizontal and vertical space to the "Notes" (تێبینی) field so it visually stands out as the primary multi-line area.
+3. Dynamic Auto-Expansion (Safe Scaling):
+
+If a user types a long string of text into fields like "Address" (ناونیشان), the input box must dynamically expand horizontally to fit the text.
+
+Strict Constraint: This expansion MUST NOT break the grid, push other elements out of the screen, or cause horizontal scrolling. The UI must adapt smoothly.
+
+PART 2: Middle Section Layout (25% / 75% Split-Screen)
+Currently, the Purchases table takes full width and calculations are at the bottom. You MUST fix this by splitting the screen side-by-side:
+1. The Split Container:
+
+Wrap the middle section in a container using: display: flex; flex-direction: row; gap: 10px; width: 100%; (Or CSS Grid with 25% 75%).
+2. Left Panel (Calculations - strictly 25% width):
+
+Move all financial fields into this left panel, stacked vertically: کۆی گشتی, قەرزی کۆن, پارەدان, داشکاندن, قەرزی ماوە, and کۆی دانە.
+
+The layout must be: Label on the right (with cyan background #d8f4f9), Input exactly on the left.
+
+Apply flex: 1; min-width: 80px; overflow: hidden; to the inputs here so numbers NEVER overflow outside their boxes.
+3. Right Panel (Data Grid / Table - strictly 75% width):
+
+The Purchases data grid/table (گروپ, بارکۆد, ناوی مواد, دانە, نرخ, etc.) goes strictly inside this right panel.
+
+Action: Execute these changes immediately to achieve 100% UI consistency between the Purchases and Sales forms.

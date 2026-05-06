@@ -32,6 +32,7 @@ import {
   Lock,
   LockOpen,
   Printer,
+  Eye,
 } from "lucide-react";
 
 type InvoiceItem = {
@@ -67,7 +68,7 @@ function FieldRow({
 }) {
   return (
     <div className={`flex items-stretch border border-slate-300 ${className ?? ""}`}>
-      <div className={`${labelWidth} bg-cyan-100 text-slate-800 text-[12px] font-semibold flex ${alignTop ? "items-start pt-1.5" : "items-center"} justify-center px-2 border-l border-slate-300 shrink-0`}>
+      <div className={`${labelWidth} bg-cyan-100 text-slate-800 text-[12px] font-semibold flex ${alignTop ? "items-start pt-1.5" : "items-center"} justify-center px-2 border-l border-slate-300 shrink-0 whitespace-nowrap overflow-hidden`}>
         {label}
       </div>
       <div className="flex-1 bg-white min-w-0">{children}</div>
@@ -85,14 +86,20 @@ function PlainInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
 }
 
 function StatRow({
-  label, value, accent, editable, onChange, readOnly,
+  labelKu, labelAr, value, accent, editable, onChange, readOnly, suffix,
+  labelClassName, valueClassName, labelWidth,
 }: {
-  label: string;
+  labelKu: string;
+  labelAr?: string;
   value: string | number;
   accent?: "muted" | "warn" | "ok";
   editable?: boolean;
   onChange?: (v: number) => void;
   readOnly?: boolean;
+  suffix?: string;
+  labelClassName?: string;
+  valueClassName?: string;
+  labelWidth?: string;
 }) {
   const valueColor =
     accent === "warn"
@@ -101,23 +108,31 @@ function StatRow({
         ? "text-emerald-700"
         : "text-slate-900";
   return (
-    <div className="flex items-stretch border border-slate-300">
-      <div className="w-28 bg-cyan-100 text-slate-800 text-[12px] font-semibold flex items-center px-2 border-l border-slate-300">
-        {label}
+    <div className="flex items-stretch border border-slate-300 min-h-[28px] w-full overflow-hidden">
+      <div className={`${labelWidth ?? "w-44"} text-slate-800 text-[12px] font-semibold flex items-center justify-end px-2 border-l border-slate-300 shrink-0 whitespace-nowrap overflow-hidden ${labelClassName ?? "bg-cyan-100"}`}>
+        <span className="truncate">
+          {labelKu}
+          {labelAr ? <span className="text-slate-500 font-normal"> / {labelAr}</span> : null}
+        </span>
       </div>
       {editable ? (
-        <input
-          type="number"
-          value={(value as number) || ""}
-          readOnly={readOnly}
-          onChange={(e) => onChange?.(Number(e.target.value))}
-          className={`flex-1 px-2 py-1 bg-white text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed`}
-          placeholder="0"
-          dir="ltr"
-        />
+        <div className={`flex-1 min-w-0 flex items-stretch ${valueClassName ?? "bg-white"}`}>
+          <input
+            type="number"
+            value={(value as number) || ""}
+            readOnly={readOnly}
+            onChange={(e) => onChange?.(Number(e.target.value))}
+            className={`flex-1 w-0 min-w-0 px-2 py-1 bg-transparent text-left tabular-nums outline-none text-sm font-bold ${valueColor} read-only:cursor-not-allowed`}
+            placeholder="0"
+            dir="ltr"
+            style={{ boxSizing: "border-box" }}
+          />
+          {suffix ? <span className="px-2 flex items-center text-[11px] text-slate-500 shrink-0">{suffix}</span> : null}
+        </div>
       ) : (
-        <div className={`flex-1 bg-white px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor}`} dir="ltr">
-          {value}
+        <div className={`flex-1 min-w-0 px-2 py-1 text-left tabular-nums font-bold text-sm ${valueColor} flex items-center justify-between overflow-hidden ${valueClassName ?? "bg-white"}`} dir="ltr">
+          <span className="truncate min-w-0">{value}</span>
+          {suffix ? <span className="text-[11px] text-slate-500 ms-2 shrink-0">{suffix}</span> : null}
         </div>
       )}
     </div>
@@ -145,7 +160,7 @@ export default function PurchasesNew() {
   const [driverMobile] = useState("");
 
   const [discount, setDiscount] = useState(0);
-  const discountPercent = 0;
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [paidAmount, setPaidAmount] = useState(0);
   const [previousDebt, setPreviousDebt] = useState(0);
 
@@ -251,6 +266,7 @@ export default function PurchasesNew() {
     setNotes("");
     setSearchPrev("");
     setDiscount(0);
+    setDiscountPercent(0);
     setPaidAmount(0);
     setPreviousDebt(0);
     setItems([emptyItem()]);
@@ -328,74 +344,119 @@ export default function PurchasesNew() {
           کڕین
         </div>
 
-        {/* === TOP HEADER : 3 columns (right / middle / left in RTL) === */}
-        <div className="p-2 grid grid-cols-12 gap-2 border-b border-slate-300 bg-slate-50">
-          {/* RIGHT block — Receipt No / Date / Supplier Name */}
-          <div className="col-span-12 lg:col-span-4 space-y-1">
-            <FieldRow label="ژمارەی وەسڵ" labelWidth="w-28">
-              <PlainInput value={`${nextInvoiceNo} (جدید)`} readOnly className="font-mono font-bold text-slate-700 text-left" dir="ltr" />
-            </FieldRow>
-            <FieldRow label="بەروار" labelWidth="w-28">
-              <PlainInput type="date" value={invoiceDate} readOnly={editLocked} onChange={(e) => setInvoiceDate(e.target.value)} dir="ltr" />
-            </FieldRow>
-            <FieldRow label="ناوی فرۆشیار" labelWidth="w-28">
-              <div className="flex h-full">
-                <div className="flex-1">
-                  <SearchableSelect
-                    value={supplierId}
-                    onChange={setSupplierId}
-                    disabled={editLocked}
-                    placeholder="گەڕان بە ناو / کۆد..."
-                    buttonClassName="text-sm border-0 rounded-none h-[30px]"
-                    options={(suppliers ?? []).map((s: { id: number; name: string }) => {
-                      const code = String(s.id).padStart(3, "0");
-                      return {
-                        value: String(s.id),
-                        label: s.name,
-                        sub: code,
-                        haystack: `${s.name} ${code}`,
-                      };
-                    })}
-                  />
-                </div>
-                <div className="border-r border-slate-300 flex items-center px-1">
-                  <QuickAddParty kind="supplier" onCreated={(id) => setSupplierId(String(id))} />
-                </div>
-              </div>
-            </FieldRow>
+        {/* === TOP HEADER : 4 rows (compact, mirrors sales) === */}
+        <div className="p-2 space-y-1 border-b border-slate-300 bg-slate-50">
+          {/* Row 1: ژ.وەسڵ | کۆد/فرۆشیار | بەروار | مۆبایل */}
+          <div className="grid grid-cols-12 gap-1">
+            <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+              <FieldRow label="ژ.وەسڵ" labelWidth="w-20">
+                <PlainInput value={nextInvoiceNo} readOnly className="font-mono font-bold text-slate-700 text-center" dir="ltr" />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+              <FieldRow label="کۆد/فرۆشیار" labelWidth="w-24">
+                <PlainInput
+                  value={supplierId}
+                  onChange={(e) => setSupplierId(e.target.value)}
+                  readOnly={editLocked}
+                  placeholder="کۆد..."
+                  dir="ltr"
+                  className="text-center font-mono"
+                />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-4">
+              <FieldRow label="بەروار" labelWidth="w-20">
+                <PlainInput type="date" value={invoiceDate} readOnly={editLocked} onChange={(e) => setInvoiceDate(e.target.value)} dir="ltr" />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+              <FieldRow label="مۆبایل" labelWidth="w-20">
+                <PlainInput value={supplierMobile} readOnly={editLocked} onChange={(e) => setSupplierMobile(e.target.value)} dir="ltr" placeholder="07XX..." />
+              </FieldRow>
+            </div>
           </div>
 
-          {/* MIDDLE block — Mobile / Address / Notes */}
-          <div className="col-span-12 lg:col-span-4 space-y-1">
-            <FieldRow label="مۆبایل" labelWidth="w-24">
-              <PlainInput value={supplierMobile} readOnly={editLocked} onChange={(e) => setSupplierMobile(e.target.value)} dir="ltr" placeholder="07XX..." />
-            </FieldRow>
-            <FieldRow label="ناونیشان" labelWidth="w-24">
-              <PlainInput value={supplierAddress} readOnly={editLocked} onChange={(e) => setSupplierAddress(e.target.value)} placeholder="ناونیشان..." />
-            </FieldRow>
-            <FieldRow label="تێبینی" labelWidth="w-24" alignTop>
-              <AutoTextarea
-                value={notes}
-                readOnly={editLocked}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="تێبینی..."
-                minRows={1}
-                maxRows={3}
-                className="read-only:cursor-not-allowed text-sm"
-              />
-            </FieldRow>
+          {/* Row 2: ئۆتۆمبێل | ناونیشان | دراو */}
+          <div className="grid grid-cols-12 gap-1">
+            <div className="col-span-6 sm:col-span-4">
+              <FieldRow label="ئۆتۆمبێل" labelWidth="w-24">
+                <PlainInput value={vehicle} readOnly={editLocked} onChange={(e) => setVehicle(e.target.value)} dir="ltr" placeholder="ژمارەی ئۆتۆمبێل..." />
+              </FieldRow>
+            </div>
+            <div className="col-span-6 sm:col-span-4">
+              <FieldRow label="ناونیشان" labelWidth="w-24">
+                <PlainInput value={supplierAddress} readOnly={editLocked} onChange={(e) => setSupplierAddress(e.target.value)} placeholder="ناونیشان..." />
+              </FieldRow>
+            </div>
+            <div className="col-span-12 sm:col-span-4">
+              <FieldRow label="دراو" labelWidth="w-20">
+                <div className="flex h-full">
+                  {(["IQD", "USD"] as const).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      disabled={editLocked}
+                      onClick={() => setCurrency(c)}
+                      className={`flex-1 px-2 py-1 text-xs font-bold border-l border-slate-300 last:border-l-0 transition-colors disabled:cursor-not-allowed ${
+                        currency === c ? "bg-emerald-500 text-white" : "bg-white text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      {c === "IQD" ? "د.ع" : "$"}
+                    </button>
+                  ))}
+                </div>
+              </FieldRow>
+            </div>
           </div>
 
-          {/* LEFT block — Search by receipt no + currency + vehicle */}
-          <div className="col-span-12 lg:col-span-4 space-y-1">
-            <FieldRow label="گەڕان بە پێی ژمارەی وەسڵ" labelWidth="w-44">
-              <div className="flex h-full">
+          {/* Row 3: ناوی فرۆشیار (autocomplete + add) | کەشف حساب + dropdown + گەڕان */}
+          <div className="grid grid-cols-12 gap-1">
+            <div className="col-span-12 lg:col-span-6">
+              <FieldRow label="ناوی فرۆشیار" labelWidth="w-24">
+                <div className="flex h-full">
+                  <div className="flex-1 min-w-0">
+                    <SearchableSelect
+                      value={supplierId}
+                      onChange={setSupplierId}
+                      disabled={editLocked}
+                      placeholder="گەڕان بە ناو / کۆد..."
+                      buttonClassName="text-sm border-0 rounded-none h-[30px]"
+                      options={(suppliers ?? []).map((s: { id: number; name: string }) => {
+                        const code = String(s.id).padStart(3, "0");
+                        return {
+                          value: String(s.id),
+                          label: s.name,
+                          sub: code,
+                          haystack: `${s.name} ${code}`,
+                        };
+                      })}
+                    />
+                  </div>
+                  <div className="border-r border-slate-300 flex items-center px-1 shrink-0">
+                    <QuickAddParty kind="supplier" onCreated={(id) => setSupplierId(String(id))} />
+                  </div>
+                </div>
+              </FieldRow>
+            </div>
+            <div className="col-span-12 lg:col-span-6">
+              <div className="flex items-stretch border border-slate-300 h-full">
+                <button
+                  type="button"
+                  onClick={() => setStmtOpen(true)}
+                  disabled={!supplierId}
+                  className="bg-cyan-100 hover:bg-cyan-200 text-slate-800 text-[12px] font-semibold px-3 border-l border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shrink-0"
+                  title="کەشف حسابی فرۆشیار"
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  کەشف حساب
+                </button>
                 <select
                   value={searchPrev}
                   onChange={(e) => setSearchPrev(e.target.value)}
-                  className="flex-1 px-2 py-1 bg-transparent border-0 outline-none text-sm"
+                  className="flex-1 min-w-0 px-2 py-1 bg-white border-0 outline-none text-sm border-l border-slate-300"
                 >
-                  <option value="">— پسووڵە —</option>
+                  <option value="">— پسوولە —</option>
                   {(supplierInvoices.length ? supplierInvoices : allInvoices ?? []).map((inv: { id: number; invoiceNumber: string; invoiceDate: string }) => (
                     <option key={inv.id} value={inv.id}>
                       #{inv.invoiceNumber} — {inv.invoiceDate}
@@ -406,46 +467,40 @@ export default function PurchasesNew() {
                   type="button"
                   onClick={openPrevInvoice}
                   disabled={!searchPrev}
-                  className="px-2 border-r border-slate-300 bg-slate-50 hover:bg-slate-100 disabled:opacity-40"
-                  title="کردنەوەی پسووڵە"
+                  className="bg-cyan-100 hover:bg-cyan-200 text-slate-800 text-[12px] font-semibold px-3 border-r border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 shrink-0"
+                  title="گەڕان بەپێی ژ.وەسڵ"
                 >
                   <FolderOpen className="h-3.5 w-3.5" />
+                  گەڕان بەپێی ژ.وەسڵ
                 </button>
               </div>
-            </FieldRow>
-            <FieldRow label="دراو" labelWidth="w-24">
-              <div className="flex h-full">
-                {(["IQD", "USD"] as const).map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    disabled={editLocked}
-                    onClick={() => setCurrency(c)}
-                    className={`flex-1 px-2 py-1 text-xs font-bold border-l border-slate-300 last:border-l-0 transition-colors disabled:cursor-not-allowed ${
-                      currency === c ? "bg-emerald-500 text-white" : "bg-white text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    {c === "IQD" ? "دینار (د.ع)" : `دۆلار ($) ${currency === "USD" ? "" : ""}`}
-                  </button>
-                ))}
-              </div>
-            </FieldRow>
-            <FieldRow label="ئۆتۆمبێل" labelWidth="w-24">
-              <PlainInput value={vehicle} readOnly={editLocked} onChange={(e) => setVehicle(e.target.value)} dir="ltr" placeholder="ژمارەی ئۆتۆمبێل..." />
-            </FieldRow>
-            {currency === "USD" && (
-              <div className="text-[11px] text-slate-500 px-2" dir="ltr">
-                1 USD = {rate.toLocaleString("en-US")} IQD
-              </div>
-            )}
+            </div>
           </div>
+
+          {/* Row 4: تێبینی (full width, large) */}
+          <FieldRow label="تێبینی" labelWidth="w-20" alignTop>
+            <AutoTextarea
+              value={notes}
+              readOnly={editLocked}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="تێبینی..."
+              minRows={2}
+              maxRows={5}
+              className="read-only:cursor-not-allowed text-sm"
+            />
+          </FieldRow>
+
+          {currency === "USD" && (
+            <div className="text-[11px] text-slate-500 px-2" dir="ltr">
+              1 USD = {rate.toLocaleString("en-US")} IQD
+            </div>
+          )}
         </div>
 
-        {/* === MAIN ITEMS GRID ===
-            Headers in DOM order (RTL renders first → rightmost):
-            گروپ | بارکۆد | ناوی مواد | دانە | نرخ | کۆی گشتی | بەروار | ژ.وەسڵ | × */}
-        <div className="px-2 py-2 border-b border-slate-300">
-          <div className="border border-slate-400 bg-white overflow-x-auto">
+        {/* === MIDDLE SECTION: side-by-side table (75%) + calc panel (25%) === */}
+        <div className="px-2 py-2 border-b border-slate-300 grid grid-cols-1 lg:grid-cols-4 gap-2">
+          {/* RIGHT (in RTL = first): items table — 75% / 3 cols of 4 */}
+          <div className="lg:col-span-3 order-1 border border-slate-400 bg-white overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-amber-50 text-slate-800 text-[12px]">
@@ -455,8 +510,7 @@ export default function PurchasesNew() {
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[8%]">دانە</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[10%]">نرخ ({currency})</th>
                   <th className="border border-slate-400 px-2 py-1.5 font-bold w-[14%]">کۆی گشتی</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[12%]">بەروار</th>
-                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[8%]">ژ.وەسڵ</th>
+                  <th className="border border-slate-400 px-2 py-1.5 font-bold w-[14%]">بەروار</th>
                   <th className="border border-slate-400 px-1 py-1.5 font-bold w-9"></th>
                 </tr>
               </thead>
@@ -523,9 +577,6 @@ export default function PurchasesNew() {
                         dir="ltr"
                       />
                     </td>
-                    <td className="border border-slate-400 px-2 py-1 text-center font-mono text-xs text-slate-600 bg-slate-50" dir="ltr">
-                      {nextInvoiceNo}
-                    </td>
                     <td className="border border-slate-400 p-0 text-center">
                       <button
                         type="button"
@@ -551,19 +602,55 @@ export default function PurchasesNew() {
               </tbody>
             </table>
           </div>
+
+          {/* LEFT (in RTL = last): calc panel — 25% / 1 col of 4 */}
+          <div className="lg:col-span-1 order-2 space-y-1">
+            <StatRow labelKu={`کۆی گشتی (${currency})`} value={fmt(subtotal)} suffix={currency === "IQD" ? "د.ع" : "$"} labelWidth="w-32" />
+            <StatRow labelKu="قەرزی کۆن" labelAr="الدین" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} labelWidth="w-32" />
+            <StatRow labelKu="پارەدان" labelAr="الواصلات" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" labelWidth="w-32" />
+            {/* Quick-pay buttons: pay-after-discount | pay-full-subtotal */}
+            <div className="flex items-stretch border border-red-300 min-h-[26px]">
+              <button
+                type="button"
+                onClick={() => setPaidAmount(Math.max(0, totalAfterDiscount))}
+                title="پارەدانی تەواو دوای داشکاندن"
+                className="w-32 bg-white hover:bg-red-100 active:bg-red-200 text-red-700 text-[10px] font-bold flex items-center justify-end px-2 border-l border-red-300 shrink-0 transition-colors cursor-pointer"
+              >
+                % = دوای داشکاندن
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaidAmount(Math.max(0, subtotal))}
+                title="پارەدانی تەواو بێ داشکاندن"
+                className="flex-1 bg-white hover:bg-red-100 active:bg-red-200 text-red-700 text-[10px] font-bold flex items-center justify-start px-2 transition-colors cursor-pointer"
+              >
+                کۆی گشتی
+              </button>
+            </div>
+            <StatRow labelKu="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} labelWidth="w-32" />
+            <StatRow labelKu="داشکاندنی ڕێژەیی (%)" value={discountPercent} editable readOnly={editLocked} onChange={setDiscountPercent} suffix="%" valueClassName="bg-amber-50" labelWidth="w-32" />
+            <StatRow labelKu="قەرزی ماوە" value={fmt(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix={currency === "IQD" ? "د.ع" : "$"} labelWidth="w-32" />
+            <StatRow labelKu="کۆی دانە" value={totalQuantity.toLocaleString("en-US")} labelWidth="w-32" />
+          </div>
         </div>
 
-        {/* === BOTTOM-LEFT FINANCIAL TOTALS (6 stacked rows) === */}
+        {/* === BOTTOM TOTALS BAR (3 stacked rows + big total box) === */}
         <div className="px-2 pb-2 grid grid-cols-12 gap-2">
-          <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-1">
-            <StatRow label={`کۆی گشتی (${currency})`} value={fmt(subtotal)} />
-            <StatRow label="قەرزی کۆن" value={previousDebt} editable readOnly={editLocked} onChange={setPreviousDebt} />
-            <StatRow label="پارەدان" value={paidAmount} editable readOnly={editLocked} onChange={setPaidAmount} accent="ok" />
-            <StatRow label="داشکاندن" value={discount} editable readOnly={editLocked} onChange={setDiscount} />
-            <StatRow label="قەرزی ماوە" value={fmt(remaining)} accent={remaining > 0 ? "warn" : "ok"} />
-            <StatRow label="کۆی دانە" value={totalQuantity.toLocaleString("en-US")} />
+          <div className="col-span-12 lg:col-span-7 space-y-1">
+            <StatRow labelKu="کڕین" labelAr="جمع کل المشتریات" value={fmt(subtotal)} suffix={currency === "IQD" ? "د.ع" : "$"} labelClassName="bg-violet-200" labelWidth="flex-1" />
+            <StatRow labelKu="پارەدان" labelAr="جمع کل الواصلات" value={fmt(paidAmount)} suffix={currency === "IQD" ? "د.ع" : "$"} labelClassName="bg-emerald-200" labelWidth="flex-1" />
+            <StatRow labelKu="فەرز" labelAr="باقی الحساب" value={fmt(remaining)} accent={remaining > 0 ? "warn" : "ok"} suffix={currency === "IQD" ? "د.ع" : "$"} labelClassName="bg-amber-200" labelWidth="flex-1" />
           </div>
-          <div className="col-span-12 md:col-span-7 lg:col-span-8" />
+          <div className="col-span-12 lg:col-span-5">
+            <div className="flex items-stretch border border-slate-300 h-full min-h-[92px]">
+              <div className="flex-1 bg-violet-200 text-slate-800 text-[13px] font-semibold flex items-center justify-end px-3 border-l border-slate-300 text-right">
+                کۆی ئەم پسوولە / جمع الکل الفاتورە
+              </div>
+              <div className="w-40 bg-white px-3 flex items-center justify-between" dir="ltr">
+                <span className="text-2xl font-extrabold text-slate-900 tabular-nums">{fmt(totalAfterDiscount)}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* === BOTTOM ACTION TOOLBAR === */}
@@ -609,21 +696,17 @@ export default function PurchasesNew() {
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-1 shadow-sm h-8 px-3"
             title="پاشەکەوت + کردنەوە بە شێوەی وەسڵی A4 بۆ چاپ"
           >
-            <Printer className="h-4 w-4" /> وەسڵ - گەورە
+            <Printer className="h-4 w-4" /> وەسڵی گەورە A4
           </Button>
 
           <Button
             type="button"
-            onClick={() => setEditLocked((v) => !v)}
-            className={`${
-              editLocked
-                ? "bg-pink-400 hover:bg-pink-500 text-red-900 border border-red-700"
-                : "bg-emerald-500 hover:bg-emerald-600 text-white border border-emerald-800"
-            } font-bold gap-1 shadow-sm h-8 px-3`}
-            title={editLocked ? "کردنەوە بۆ دەستکاری" : "داخستنی دەستکاری"}
+            onClick={() => { if (searchPrev) navigate(`/purchases/${searchPrev}`); }}
+            disabled={!searchPrev}
+            className="bg-sky-500 hover:bg-sky-600 text-white font-bold gap-1 shadow-sm h-8 px-3"
+            title="بینینی پسوولەی هەڵبژێردراو"
           >
-            {editLocked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
-            کردنەوە
+            <Eye className="h-4 w-4" /> بینینی پسوولە
           </Button>
 
           <Button
@@ -646,9 +729,26 @@ export default function PurchasesNew() {
 
           <Button
             type="button"
+            onClick={() => setEditLocked((v) => !v)}
+            className={`${
+              editLocked
+                ? "bg-pink-400 hover:bg-pink-500 text-red-900 border border-red-700"
+                : "bg-emerald-500 hover:bg-emerald-600 text-white border border-emerald-800"
+            } font-bold gap-1 shadow-sm h-8 px-3`}
+            title={editLocked ? "کردنەوە بۆ دەستکاری" : "داخستنی دەستکاری"}
+          >
+            {editLocked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
+            کردنەوە
+          </Button>
+        </div>
+
+        {/* Save button — full width, primary action */}
+        <div className="border-t border-slate-300 bg-slate-100 px-2 py-1.5">
+          <Button
+            type="button"
             onClick={handleSubmit}
             disabled={editLocked || creating || !supplierId}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold gap-1 shadow-sm h-8 px-3 min-w-[100px]"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-sm h-9"
             title={editLocked ? "بۆ پاشەکەوت، کردنەوە دابگرە" : "پاشەکەوت"}
           >
             <Save className="h-4 w-4" /> {creating ? "تۆمارکردن..." : "پاشەکەوت"}
