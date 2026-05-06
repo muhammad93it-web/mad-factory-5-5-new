@@ -241,9 +241,9 @@ export default function Payroll() {
       <div className="p-1 grid grid-cols-12 gap-1.5 bg-slate-100 flex-1 min-h-0 overflow-hidden">
         {/* LEFT PANEL: Salary grid (~70%) — order-2 in RTL grid puts it on the LEFT */}
         <div className="col-span-12 lg:col-span-8 order-2 flex flex-col gap-1 min-h-0">
-          {/* Data grid - only this scrolls */}
-          <div className="bg-white border border-slate-400 overflow-y-auto flex-1 min-h-0">
-            <table className="w-full text-sm border-collapse" dir="rtl">
+          {/* Data grid - only this scrolls; container has no bg so empty area collapses visually */}
+          <div className="overflow-y-auto flex-1 min-h-0">
+            <table className="w-full text-sm border-collapse bg-white border border-slate-400" dir="rtl">
               <thead>
                 <tr className="bg-[#92d050] text-slate-900">
                   <Th>Tebene</Th>
