@@ -192,7 +192,7 @@ export default function SalesNew() {
   });
 
   const nextInvoiceNo = useMemo(
-    () => String((allInvoices?.length ?? 0) + 1).padStart(2, "0"),
+    () => String((allInvoices?.length ?? 0) + 1),
     [allInvoices],
   );
 
