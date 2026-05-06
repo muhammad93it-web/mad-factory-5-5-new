@@ -1,0 +1,51 @@
+CRITICAL UI TASK: EXACT 1:1 REPLICATION OF THE "WORKERS' SALARY" (مووچەی کرێکاران) MODULE
+
+Please create/rebuild the "Workers' Salary" (مووچەی کرێکاران) interface exactly as shown in the attached image. This must be built for our web system using CSS Grid/Flexbox, strictly maintaining the dense, desktop-style legacy UI. The entire page MUST be dir="rtl".
+
+1. Global Theme & Header:
+
+Main Header: Full-width top bar with a solid Purple background (#7030a0 or similar). Centered white bold text: "مووچەی کرێکاران".
+
+Top Toolbar (Below Header): A horizontal row of buttons (light gray background, dark borders). Buttons (Right to Left): ژمارە (Input), ڕاپۆرتی گشتی 1, ڕاپۆرتی گشتی 2, زانیاری, ڕاپۆرتی تاك (Highlighted/Active tab style), ڕاپۆرتی ساڵانە, زیادکردنی مانگ, ڕاپۆرتی مانگانە.
+
+2. Main Body (Split Layout - Very Important):
+Below the top toolbar, split the screen into two main panels using Flexbox or Grid (gap: 10px; padding: 5px;):
+
+A. Right Panel (Employee Details & Search - ~30% Width):
+
+Vertically stack input fields. Label strictly on the right, Input on the left.
+
+Regular Inputs: Label background must be light cyan/blue (#d8f4f9).
+Fields (Top to Bottom): ناوى سيانى, كۆد, جۆرى كار (Dropdown), مۆبايل, مۆبايل 2, مۆبايل 3, تێبينى, شوێنى لە دايك بوون, شوێنى نيشته‌جێبوون, ئاستى خوێنده‌وارى, به‌روارى ده‌ستبه‌كار بوون, ساڵى لە دايكبوون, مووچه‌ى ڕۆژانە.
+
+Search Inputs (Bottom of Right Panel): Add a little gap, then stack 3 search dropdowns. Their label background MUST be Light Green (#a9d18e).
+Fields: گه‌ڕان بە پێی ناو, گه‌ڕان بە پێی كۆد, گه‌ڕان بە پێی ژمارە.
+
+B. Left Panel (Salary Data Grid & Totals - ~70% Width):
+
+Data Grid (Table): A bordered table taking up most of the space.
+
+Table Headers MUST have a vibrant Light Green background (#92d050).
+
+Columns (Strictly Right to Left): Tebene | ساڵ | مانگ | ڕۆژ | مووچه‌ى ڕۆژ | كۆى موچە | وه‌گيراو | كۆى گشتى پارە.
+
+Grid Totals (Under the table): Create 3 text boxes aligned strictly under the last 3 columns (كۆى موچە, وه‌گيراو, كۆى گشتى پارە) to display their calculated sums (e.g., 2,800,000 | 2,050,000 | 750,000). Text should be colored appropriately (e.g., green/blue).
+
+Action Row (Below Totals): A row containing:
+
+Left side: 4 small navigation arrow buttons [>|] [>] [<] [|<].
+
+Next to them: Buttons زیادکردنی موچە and گۆڕينى مانگى(13)بۆ (1).
+
+3. Absolute Bottom Toolbar:
+
+Full-width fixed bottom bar with the same Purple background as the header.
+
+Right side: Button زیادکردنی ناو (White bg, purple text), 4 orange navigation arrow buttons [>|] [>] [<] [|<], and a ڕيفريش button (Light gray).
+
+Left side: A small سڕینەوە button (White bg, red text).
+
+4. Strict English Numerals Rule:
+Apply the global rule: ALL numbers typed or displayed in this form must be strictly Western Arabic numerals (0-9).
+
+Execute this pixel-perfect layout using custom CSS to override any generic padding or modern rounded UI. It must look like the dense desktop app screenshot.
