@@ -4,7 +4,8 @@
   "description": "سیستەمی بەڕێوەبردنی کارگەی خشتی ماد",
   "start_url": "/",
   "scope": "/",
-  "display": "fullscreen",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "orientation": "landscape",
   "background_color": "#1e293b",
   "theme_color": "#1e40af",
@@ -17,6 +18,11 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    { "name": "فرۆشتنی نوێ", "url": "/sales/new" },
+    { "name": "کڕینی نوێ", "url": "/purchases/new" },
+    { "name": "خەزینە", "url": "/cashbox" }
   ],
   "categories": ["business", "productivity"]
 }

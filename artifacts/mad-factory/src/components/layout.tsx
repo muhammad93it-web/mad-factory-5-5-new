@@ -3,6 +3,10 @@ import { Link, useLocation } from "wouter";
 import { useGetLatestExchangeRate, getGetLatestExchangeRateQueryKey } from "@workspace/api-client-react";
 import { DollarSign, Settings, Bell, Factory, Home, ChevronRight, LogOut, Users, ShieldCheck, User, HardDriveDownload, Maximize, Minimize, Download, X, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/auth";
+import { ConnectivityBadge } from "@/components/connectivity-badge";
+import { UpdateBanner } from "@/components/update-banner";
+
+const INSTALL_DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BeforeInstallPromptEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
@@ -38,14 +42,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
 
-  // Capture beforeinstallprompt
+  // Capture beforeinstallprompt — show banner unless dismissed within last 7 days
   useEffect(() => {
     if (isPWA) return;
-    const dismissed = localStorage.getItem("pwa-install-dismissed");
+    const isStillDismissed = () => {
+      const ts = localStorage.getItem("pwa-install-dismissed-at");
+      if (!ts) return false;
+      return Date.now() - Number(ts) < INSTALL_DISMISS_TTL_MS;
+    };
     const handler = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
-      if (!dismissed) setShowInstallBanner(true);
+      if (!isStillDismissed()) setShowInstallBanner(true);
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
@@ -63,7 +71,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   const dismissBanner = useCallback(() => {
     setShowInstallBanner(false);
-    localStorage.setItem("pwa-install-dismissed", "1");
+    localStorage.setItem("pwa-install-dismissed-at", String(Date.now()));
   }, []);
 
   return (
@@ -110,6 +118,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
           ) : (
             <div className="h-9 w-44 bg-primary-foreground/10 animate-pulse rounded-lg" />
           )}
+
+          <ConnectivityBadge />
 
           <Link href="/alerts" className="relative p-2 rounded-full hover:bg-primary-foreground/10 transition-colors">
             <Bell className="h-5 w-5" />
@@ -168,6 +178,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
       </header>
+
+      {/* Update available banner */}
+      <UpdateBanner />
 
       {/* PWA Install Banner */}
       {showInstallBanner && !isPWA && (
