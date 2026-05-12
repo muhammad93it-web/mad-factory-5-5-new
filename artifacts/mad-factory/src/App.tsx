@@ -10,6 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Customers from "@/pages/customers";
 import CustomerDetail from "@/pages/customer-detail";
 import CustomerStatement from "@/pages/customer-statement";
+import SupplierStatement from "@/pages/supplier-statement";
 import Sales from "@/pages/sales";
 import SalesNew from "@/pages/sales-new";
 import SalesDetail from "@/pages/sales-detail";
@@ -105,6 +106,7 @@ function Router() {
         <PermissionRoute path="/sales/consolidated" slug="sales" component={SalesConsolidated} />
         <PermissionRoute path="/sales/:id" slug="sales" component={SalesDetail} />
         <PermissionRoute path="/suppliers" slug="suppliers" component={Suppliers} />
+        <PermissionRoute path="/supplier-statement" slug="suppliers" component={SupplierStatement} />
         <PermissionRoute path="/suppliers/:id" slug="suppliers" component={SupplierDetail} />
         <PermissionRoute path="/purchases" slug="purchases" component={Purchases} />
         <PermissionRoute path="/purchases/new" slug="purchases" component={PurchasesNew} />

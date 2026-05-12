@@ -71,7 +71,7 @@ const sections: Section[] = [
         items: [
           { label: "کڕین 1 (دینار)", href: "/purchases/new", icon: Truck },
           { label: "پارەدانی دابینکار", href: "/supplier-payments", icon: Receipt },
-          { label: "کەشف حسابی دابینکار", href: "/suppliers", icon: FileText },
+          { label: "کەشف حسابی دابینکار", href: "/supplier-statement", icon: FileText },
           { label: "کڕین 2 ($$)", href: "/purchases/new", icon: DollarSign },
           { label: "نرخی دۆلار", href: "/settings", icon: Tag },
         ],
@@ -83,7 +83,7 @@ const sections: Section[] = [
         items: [
           { label: "کڕینی ڕۆژانە", href: "/purchases", icon: Clock },
           { label: "کڕاوەکان بە پێی بەروار", href: "/purchases", icon: CalendarRange },
-          { label: "کەشف حسابی دابینکار", href: "/suppliers", icon: FileText },
+          { label: "کەشف حسابی دابینکار", href: "/supplier-statement", icon: FileText },
           { label: "ڕاپۆرتی قەرزاری دابینکار", href: "/alerts", icon: AlertCircle },
           { label: "ناوی دابینکارەکان", href: "/suppliers", icon: Briefcase },
         ],
