@@ -40,6 +40,15 @@ export default function Sales() {
           <Button variant="outline" onClick={() => window.print()} className="gap-2"><Printer className="h-4 w-4" />چاپ</Button>
           <Button variant="outline" onClick={exportExcel} className="gap-2"><FileSpreadsheet className="h-4 w-4" />ئێگزڵ</Button>
           <Link href="/sales/consolidated"><Button variant="outline" className="gap-2 border-indigo-300 text-indigo-700 hover:bg-indigo-50"><FileText className="h-4 w-4" />پسووڵەی یەکگرتوو</Button></Link>
+          <Button
+            variant="outline"
+            disabled={!customerId}
+            onClick={() => customerId && navigate(`/customer-statement?customerId=${customerId}&general=1`)}
+            className="gap-2 border-emerald-400 text-emerald-700 hover:bg-emerald-50 disabled:opacity-40"
+            title={customerId ? "کەشف حسابی ئەم کڕیارە" : "سەرەتا کڕیارێک هەڵبژێرە"}
+          >
+            <FileText className="h-4 w-4" />کەشف حسابی کڕیار
+          </Button>
           <Link href="/sales/new"><Button className="bg-primary hover:bg-primary/90 text-white gap-2"><Plus className="h-4 w-4" />پسووڵەی نوێ</Button></Link>
         </div>
       </div>

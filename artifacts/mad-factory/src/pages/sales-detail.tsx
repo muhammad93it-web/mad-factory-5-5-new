@@ -436,7 +436,19 @@ export default function SalesDetail() {
               {/* Row 2 — customer + address */}
               <tr>
                 <th className="bg-slate-100 border border-slate-300 px-2 py-1.5 text-right">ناوی کڕیار</th>
-                <td className="border border-slate-300 px-2 py-1.5 font-bold notes-cell" colSpan={3}>{invoice.customerName}</td>
+                <td className="border border-slate-300 px-2 py-1.5 font-bold notes-cell" colSpan={3}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{invoice.customerName}</span>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/customer-statement?customerId=${invoice.customerId}&general=1`)}
+                      className="print:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded border border-emerald-400 text-emerald-700 hover:bg-emerald-50 text-[11px] font-bold"
+                      title="کەشف حسابی ئەم کڕیارە"
+                    >
+                      <FileSpreadsheet className="h-3 w-3" />کەشف حساب
+                    </button>
+                  </div>
+                </td>
                 <th className="bg-slate-100 border border-slate-300 px-2 py-1.5 text-right">ناونیشان</th>
                 <td className="border border-slate-300 px-2 py-1.5 notes-cell" colSpan={3}>
                   {editing && draft ? (

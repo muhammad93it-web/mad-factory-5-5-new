@@ -38,9 +38,17 @@ function todayIso(): string {
 
 export default function SupplierStatementPage() {
   const [, navigate] = useLocation();
-  const [mode, setMode] = useState<Mode>("search");
-  const [supplierId, setSupplierId] = useState<number | null>(null);
-  const [codeInput, setCodeInput] = useState<string>("");
+  const initial = useMemo(() => {
+    if (typeof window === "undefined") return { id: null as number | null, general: false };
+    const sp = new URLSearchParams(window.location.search);
+    const idStr = sp.get("supplierId") ?? sp.get("supplier");
+    const id = idStr ? Number(idStr) : null;
+    const general = sp.get("general") === "1" || sp.get("auto") === "1";
+    return { id: Number.isFinite(id ?? NaN) && (id ?? 0) > 0 ? id : null, general };
+  }, []);
+  const [mode, setMode] = useState<Mode>(initial.id && initial.general ? "grid-all" : "search");
+  const [supplierId, setSupplierId] = useState<number | null>(initial.id);
+  const [codeInput, setCodeInput] = useState<string>(initial.id ? String(initial.id) : "");
   const [fromDate, setFromDate] = useState<string>(todayIso());
   const [toDate, setToDate] = useState<string>(todayIso());
 
@@ -131,7 +139,7 @@ export default function SupplierStatementPage() {
         paymentAmount: Number(p.amountIqd ?? p.amount ?? 0),
         discount: 0,
         oldBalance: 0,
-        editHref: `/supplier-payments`,
+        editHref: `/supplier-payments?focusId=${p.id}`,
       });
     });
     out.sort(

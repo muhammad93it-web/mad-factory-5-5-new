@@ -37,9 +37,18 @@ function todayIso(): string {
 
 export default function CustomerStatementPage() {
   const [, navigate] = useLocation();
-  const [mode, setMode] = useState<Mode>("search");
-  const [customerId, setCustomerId] = useState<number | null>(null);
-  const [codeInput, setCodeInput] = useState<string>("");
+  // Read deep-link params from URL: ?customerId=<n>&general=1
+  const initial = useMemo(() => {
+    if (typeof window === "undefined") return { id: null as number | null, general: false };
+    const sp = new URLSearchParams(window.location.search);
+    const idStr = sp.get("customerId") ?? sp.get("customer");
+    const id = idStr ? Number(idStr) : null;
+    const general = sp.get("general") === "1" || sp.get("auto") === "1";
+    return { id: Number.isFinite(id ?? NaN) && (id ?? 0) > 0 ? id : null, general };
+  }, []);
+  const [mode, setMode] = useState<Mode>(initial.id && initial.general ? "grid-all" : "search");
+  const [customerId, setCustomerId] = useState<number | null>(initial.id);
+  const [codeInput, setCodeInput] = useState<string>(initial.id ? String(initial.id) : "");
   const [fromDate, setFromDate] = useState<string>(todayIso());
   const [toDate, setToDate] = useState<string>(todayIso());
 
@@ -127,7 +136,7 @@ export default function CustomerStatementPage() {
         paymentAmount: Number(p.amount ?? 0),
         discount: 0,
         oldBalance: 0,
-        editHref: `/customer-payments`,
+        editHref: `/customer-payments?focusId=${p.id}`,
       });
     });
     out.sort(

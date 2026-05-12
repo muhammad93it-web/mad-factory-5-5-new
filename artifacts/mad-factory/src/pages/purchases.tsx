@@ -40,6 +40,15 @@ export default function Purchases() {
           <Button variant="outline" onClick={() => window.print()} className="gap-2"><Printer className="h-4 w-4" />چاپ</Button>
           <Button variant="outline" onClick={exportExcel} className="gap-2"><FileSpreadsheet className="h-4 w-4" />ئێگزڵ</Button>
           <Link href="/purchases/consolidated"><Button variant="outline" className="gap-2 border-indigo-300 text-indigo-700 hover:bg-indigo-50"><FileText className="h-4 w-4" />پسووڵەی یەکگرتوو</Button></Link>
+          <Button
+            variant="outline"
+            disabled={!supplierId}
+            onClick={() => supplierId && navigate(`/supplier-statement?supplierId=${supplierId}&general=1`)}
+            className="gap-2 border-blue-400 text-blue-700 hover:bg-blue-50 disabled:opacity-40"
+            title={supplierId ? "کەشف حسابی ئەم دابینکارە" : "سەرەتا دابینکارێک هەڵبژێرە"}
+          >
+            <FileText className="h-4 w-4" />کەشف حسابی دابینکار
+          </Button>
           <Link href="/purchases/new"><Button className="gap-2"><Plus className="h-4 w-4" />پسووڵەی نوێ</Button></Link>
         </div>
       </div>

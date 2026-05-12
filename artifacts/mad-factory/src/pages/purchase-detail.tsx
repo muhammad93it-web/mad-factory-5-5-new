@@ -102,7 +102,17 @@ export default function PurchaseDetail() {
                 <Building2 className="h-3 w-3" />
                 ناوی دابینکار
               </div>
-              <div className="text-lg font-bold text-slate-900">{invoice.supplierName}</div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-lg font-bold text-slate-900">{invoice.supplierName}</div>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/supplier-statement?supplierId=${invoice.supplierId}&general=1`)}
+                  className="print:hidden inline-flex items-center gap-1 px-2 py-1 rounded border border-blue-400 text-blue-700 hover:bg-blue-50 text-[11px] font-bold"
+                  title="کەشف حسابی ئەم دابینکارە"
+                >
+                  کەشف حساب
+                </button>
+              </div>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">

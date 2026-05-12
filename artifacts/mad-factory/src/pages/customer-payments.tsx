@@ -74,6 +74,24 @@ export default function CustomerPayments() {
     }
   }, [sorted.length, mode, index]);
 
+  // Deep-link: ?focusId=<paymentId> jumps to that record once data loads
+  const [focusId] = useState<number | null>(() => {
+    if (typeof window === "undefined") return null;
+    const v = new URLSearchParams(window.location.search).get("focusId");
+    const n = v ? Number(v) : NaN;
+    return Number.isFinite(n) && n > 0 ? n : null;
+  });
+  const focusedRef = useRef(false);
+  useEffect(() => {
+    if (focusedRef.current || focusId === null || sorted.length === 0) return;
+    const idx = sorted.findIndex((p) => p.id === focusId);
+    if (idx >= 0) {
+      setMode("view");
+      setIndex(idx);
+      focusedRef.current = true;
+    }
+  }, [focusId, sorted]);
+
   const current = mode === "view" ? sorted[index] : null;
   const currentCustomer = useMemo(() => {
     const id = mode === "new" ? Number(draft.customerId) : current?.customerId;
