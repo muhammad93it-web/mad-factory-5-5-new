@@ -266,6 +266,7 @@ function titleFromPath(path: string): string {
     "/shareholders": "شریکەکان",
     "/alerts": "ئاگادارکردنەوەکان",
     "/debtors": "لیستی قەرزەکان",
+    "/customer-statement": "کەشف حسابی کڕیار",
     "/settings": "ڕێکخستنەکان",
     "/monthly-report": "ڕاپۆرتی مانگانە",
     "/sales-report": "ڕاپۆرتی فرۆشتن",

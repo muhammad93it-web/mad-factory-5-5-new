@@ -39,7 +39,7 @@ const sections: Section[] = [
         items: [
           { label: "فرۆشتن", href: "/sales/new", icon: ShoppingCart },
           { label: "پارەدانی کڕیار", href: "/customer-payments", icon: CreditCard },
-          { label: "کەشف حسابی کڕیار", href: "/customers", icon: FileText },
+          { label: "کەشف حسابی کڕیار", href: "/customer-statement", icon: FileText },
           { label: "قازانج", href: "/profit-loss", icon: BarChart3 },
           { label: "ڕاپۆرتی قەرزارەکان", href: "/debtors", icon: AlertCircle },
           { label: "ناوی کڕیارەکان", href: "/customers", icon: UserCircle2 },

@@ -9,6 +9,7 @@ import LoginPage from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Customers from "@/pages/customers";
 import CustomerDetail from "@/pages/customer-detail";
+import CustomerStatement from "@/pages/customer-statement";
 import Sales from "@/pages/sales";
 import SalesNew from "@/pages/sales-new";
 import SalesDetail from "@/pages/sales-detail";
@@ -97,6 +98,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <PermissionRoute path="/customers" slug="customers" component={Customers} />
+        <PermissionRoute path="/customer-statement" slug="customers" component={CustomerStatement} />
         <PermissionRoute path="/customers/:id" slug="customers" component={CustomerDetail} />
         <PermissionRoute path="/sales" slug="sales" component={Sales} />
         <PermissionRoute path="/sales/new" slug="sales" component={SalesNew} />
