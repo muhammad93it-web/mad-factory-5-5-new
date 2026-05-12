@@ -128,17 +128,6 @@ export default function CustomerPayments() {
     else if (mode === "new") setCodeInput("");
   }, [activeCustomerId, mode]);
 
-  // ── Sales-invoice search for the active customer (image: گەڕان بەپێی ژ.وەسڵ) ──
-  const { data: salesInvoices } = useListSalesInvoices(
-    { customerId: activeCustomerId ?? 0 },
-    {
-      query: {
-        enabled: !!activeCustomerId,
-        queryKey: getListSalesInvoicesQueryKey({ customerId: activeCustomerId ?? 0 }),
-      },
-    },
-  );
-
   const customerOptions = useMemo<Option[]>(
     () =>
       (customers ?? []).map((c) => ({
