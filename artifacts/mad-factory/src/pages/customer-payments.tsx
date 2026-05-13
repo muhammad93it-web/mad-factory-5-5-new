@@ -79,6 +79,7 @@ export default function CustomerPayments() {
     { query: { queryKey: getListCustomerPaymentsQueryKey({}) } },
   );
   const { data: customers } = useListCustomers({}, { query: { queryKey: getListCustomersQueryKey({}) } });
+  const { data: salesInvoices } = useListSalesInvoices({}, { query: { queryKey: getListSalesInvoicesQueryKey({}) } });
   // For "گەڕان بەپێی ژ.وەسڵ" — load this customer's sales invoices when one is picked
   const sorted = useMemo(() => [...(payments ?? [])].sort((a, b) => b.id - a.id), [payments]);
 
