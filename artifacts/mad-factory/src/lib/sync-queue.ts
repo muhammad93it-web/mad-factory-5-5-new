@@ -8,10 +8,12 @@ import {
 } from "./offline-db";
 
 export const SYNC_EVENT = "mf:sync";
+// Fired after a successful flush so React Query can invalidate all caches
+export const SYNC_COMPLETE_EVENT = "mf:sync-complete";
 
 const WRITE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const SAFE_TO_QUEUE_PATHS = /\/api\//;
-// Auth/login must NEVER be queued — they need real-time response
+// Auth endpoints must NEVER be queued — they need real-time responses
 const NEVER_QUEUE = /\/api\/(auth\/login|auth\/logout|auth\/me)/;
 
 export type SyncState = "idle" | "syncing" | "error";
@@ -41,7 +43,9 @@ export async function flushOutbox(): Promise<{ ok: number; failed: number }> {
   try {
     const items = await getOutbox();
     if (items.length === 0) return { ok: 0, failed: 0 };
+
     emitSyncState("syncing", items.length);
+
     for (const item of items) {
       try {
         const res = await fetch(item.url, {
@@ -50,8 +54,9 @@ export async function flushOutbox(): Promise<{ ok: number; failed: number }> {
           headers: { "Content-Type": "application/json", ...(item.headers ?? {}) },
           body: item.body !== undefined ? JSON.stringify(item.body) : undefined,
         });
+
         if (!res.ok && res.status >= 500) throw new Error(`HTTP ${res.status}`);
-        // 4xx is treated as a permanent failure — drop to avoid infinite retries
+        // 4xx = permanent failure — drop so it doesn't retry forever
         if (item.id !== undefined) await removeOutboxItem(item.id);
         ok++;
       } catch (err) {
@@ -69,8 +74,16 @@ export async function flushOutbox(): Promise<{ ok: number; failed: number }> {
         }
       }
     }
+
     const remaining = await getOutboxCount();
     emitSyncState(failed > 0 && remaining > 0 ? "error" : "idle", remaining);
+
+    // If any items synced successfully, notify the app to refresh its data
+    if (ok > 0) {
+      window.dispatchEvent(
+        new CustomEvent(SYNC_COMPLETE_EVENT, { detail: { ok, failed, remaining } }),
+      );
+    }
   } finally {
     flushing = false;
   }
@@ -80,7 +93,7 @@ export async function flushOutbox(): Promise<{ ok: number; failed: number }> {
 export function installAutoSync() {
   const tryFlush = async () => {
     if (!navigator.onLine) return;
-    // Cross-tab lock via Web Locks API (when available) prevents duplicate replays
+    // Web Locks API prevents duplicate replay across tabs
     const lockApi = (navigator as Navigator & { locks?: LockManager }).locks;
     if (lockApi?.request) {
       await lockApi.request("mf-outbox-flush", { ifAvailable: true }, async (lock) => {
@@ -91,32 +104,42 @@ export function installAutoSync() {
       void flushOutbox();
     }
   };
+
   window.addEventListener("online", () => void tryFlush());
-  // Periodic retry
+  // Periodic retry every 30 s
   setInterval(() => void tryFlush(), 30_000);
-  // Initial attempt
+  // Initial attempt shortly after boot
   setTimeout(() => void tryFlush(), 2_000);
 }
 
 /**
  * Patch window.fetch so write requests to /api/* are transparently
  * captured into the IndexedDB outbox when the device is offline (or the
- * request fails with a network error). The mutation appears to succeed
+ * request fails with a network error).  The mutation appears to succeed
  * (HTTP 204) so React Query treats it as success and the UI updates
- * optimistically. The outbox is replayed when connectivity returns.
+ * optimistically.  The outbox is replayed automatically when connectivity
+ * returns.
  */
 export function installFetchOfflineQueue() {
   const original = window.fetch.bind(window);
 
   window.fetch = async function patchedFetch(input: RequestInfo | URL, init?: RequestInit) {
-    const method = (init?.method || (input instanceof Request ? input.method : "GET")).toUpperCase();
-    const url = input instanceof Request ? input.url : typeof input === "string" ? input : input.toString();
+    const method = (
+      init?.method ||
+      (input instanceof Request ? input.method : "GET")
+    ).toUpperCase();
+    const url =
+      input instanceof Request
+        ? input.url
+        : typeof input === "string"
+          ? input
+          : input.toString();
 
     const isWrite = WRITE_METHODS.has(method);
     const isApi = SAFE_TO_QUEUE_PATHS.test(url);
     const blocked = NEVER_QUEUE.test(url);
 
-    // For non-write or non-API or auth requests, behave normally
+    // Non-write / non-API / auth → always pass through
     if (!isWrite || !isApi || blocked) {
       return original(input as RequestInfo, init);
     }
@@ -125,35 +148,62 @@ export function installFetchOfflineQueue() {
       let body: unknown = undefined;
       if (init?.body != null) {
         if (typeof init.body === "string") {
-          try { body = JSON.parse(init.body); } catch { body = init.body; }
+          try {
+            body = JSON.parse(init.body);
+          } catch {
+            body = init.body;
+          }
         } else {
           body = init.body;
         }
       } else if (input instanceof Request) {
-        try { body = await input.clone().json(); } catch { /* ignore */ }
+        try {
+          body = await input.clone().json();
+        } catch {
+          /* ignore */
+        }
       }
       const headerEntries: Record<string, string> = {};
       const h = new Headers(init?.headers);
-      h.forEach((v, k) => { if (k.toLowerCase() !== "content-length") headerEntries[k] = v; });
+      h.forEach((v, k) => {
+        if (k.toLowerCase() !== "content-length") headerEntries[k] = v;
+      });
       await queueRequest(url, method as OutboxItem["method"], body, headerEntries);
     };
 
+    // ── OFFLINE PATH ─────────────────────────────────────────────────────────
     if (!navigator.onLine) {
       await queueIt();
-      return new Response(null, { status: 204, statusText: "Queued (offline)" });
+      // Return a fake-success response so React Query mutation onSuccess fires
+      return new Response(
+        JSON.stringify({ queued: true, offline: true }),
+        {
+          status: 200,
+          statusText: "Queued (offline)",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
+    // ── ONLINE PATH (with network-error fallback) ─────────────────────────────
     try {
       const res = await original(input as RequestInfo, init);
-      // 5xx → also queue for retry; preserve original failed response so UI shows error
+      // 5xx → queue for retry
       if (res.status >= 500) {
         await queueIt();
       }
       return res;
-    } catch (err) {
-      // Network error — queue and synthesize success
+    } catch {
+      // Network error while nominally online → queue and synthesize success
       await queueIt();
-      return new Response(null, { status: 204, statusText: "Queued (network error)" });
+      return new Response(
+        JSON.stringify({ queued: true, offline: true }),
+        {
+          status: 200,
+          statusText: "Queued (network error)",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
   };
 }

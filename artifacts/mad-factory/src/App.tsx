@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
 import { AuthProvider, useAuth } from "@/contexts/auth";
 import { createIDBPersister } from "@/lib/offline-db";
+import { useSyncRefresh } from "@/hooks/use-sync-refresh";
 import LoginPage from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Customers from "@/pages/customers";
@@ -86,6 +87,11 @@ const PREWARM_URLS = [
   "/api/shareholders",
   "/api/settings",
 ];
+
+function SyncRefresher() {
+  useSyncRefresh();
+  return null;
+}
 
 function PreWarmCache() {
   const { user } = useAuth();
@@ -210,6 +216,7 @@ function App() {
     >
       <TooltipProvider>
         <AuthProvider>
+          <SyncRefresher />
           <PreWarmCache />
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
             <Router />
