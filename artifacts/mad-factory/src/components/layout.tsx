@@ -5,6 +5,7 @@ import { DollarSign, Settings, Bell, Factory, Home, ChevronRight, LogOut, Users,
 import { useAuth } from "@/contexts/auth";
 import { ConnectivityBadge } from "@/components/connectivity-badge";
 import { UpdateBanner } from "@/components/update-banner";
+import { OfflineBanner } from "@/components/offline-banner";
 
 const INSTALL_DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -181,6 +182,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Update available banner */}
       <UpdateBanner />
+
+      {/* Offline / sync status banner */}
+      <OfflineBanner />
 
       {/* PWA Install Banner */}
       {showInstallBanner && !isPWA && (

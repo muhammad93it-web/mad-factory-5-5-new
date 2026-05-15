@@ -75,6 +75,7 @@
     "zod": "catalog:"
   },
   "dependencies": {
+    "@tanstack/react-query-persist-client": "^5.100.10",
     "idb": "^8.0.3"
   }
 }

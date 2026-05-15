@@ -18,18 +18,64 @@ type AuthState = {
 const AuthContext = createContext<AuthState | null>(null);
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const USER_CACHE_KEY = "mf-auth-user";
+
+function saveUserCache(user: AuthUser) {
+  try {
+    localStorage.setItem(USER_CACHE_KEY, JSON.stringify(user));
+  } catch {
+    // storage full — ignore
+  }
+}
+
+function loadUserCache(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem(USER_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as AuthUser;
+  } catch {
+    return null;
+  }
+}
+
+function clearUserCache() {
+  try {
+    localStorage.removeItem(USER_CACHE_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Immediately restore from localStorage so the UI renders with the
+    // cached user even before the network call completes (or when offline).
+    const cached = loadUserCache();
+    if (cached) {
+      setUser(cached);
+      setLoading(false);
+    }
+
     fetch(`${BASE}/api/auth/me`, { credentials: "include" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data?.id) setUser(data as AuthUser);
+      .then((data: AuthUser | null) => {
+        if (data?.id) {
+          setUser(data);
+          saveUserCache(data);
+        } else if (!cached) {
+          // Server said not authenticated and no cache — clear user
+          setUser(null);
+          clearUserCache();
+        }
+        // If server is unreachable (offline) and we have a cached user,
+        // keep that cached user so the app remains usable
       })
-      .catch(() => {})
+      .catch(() => {
+        // Network error (offline) — already showing cached user, do nothing
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -44,13 +90,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await r.json().catch(() => ({}));
       throw new Error((data as { error?: string }).error ?? "هەڵە ڕووی دا");
     }
-    const data = await r.json();
-    setUser(data as AuthUser);
+    const data = await r.json() as AuthUser;
+    setUser(data);
+    saveUserCache(data);
   };
 
   const logout = async () => {
-    await fetch(`${BASE}/api/auth/logout`, { method: "POST", credentials: "include" });
+    try {
+      await fetch(`${BASE}/api/auth/logout`, { method: "POST", credentials: "include" });
+    } catch {
+      // ignore network errors on logout
+    }
     setUser(null);
+    clearUserCache();
   };
 
   const hasPermission = (slug: string) => {

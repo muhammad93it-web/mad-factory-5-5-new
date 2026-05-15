@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
 import { AuthProvider, useAuth } from "@/contexts/auth";
+import { createIDBPersister } from "@/lib/offline-db";
 import LoginPage from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Customers from "@/pages/customers";
@@ -43,14 +45,72 @@ import UsersPage from "@/pages/users";
 import BackupPage from "@/pages/backup";
 import NotFound from "@/pages/not-found";
 
+// 24 hours — keep data in IDB cache so the app works fully offline
+const GC_TIME = 1000 * 60 * 60 * 24;
+// 5 minutes — serve from cache without network round-trip
+const STALE_TIME = 1000 * 60 * 5;
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      gcTime: GC_TIME,
+      staleTime: STALE_TIME,
+      retry: (failureCount) => {
+        if (!navigator.onLine) return false;
+        return failureCount < 2;
+      },
       refetchOnWindowFocus: false,
+      // Serve IDB-persisted data immediately even when offline
+      networkMode: "offlineFirst",
+    },
+    mutations: {
+      networkMode: "offlineFirst",
+      retry: false,
     },
   },
 });
+
+const persister = createIDBPersister();
+
+// Critical endpoints to pre-warm so they're available offline immediately
+const PREWARM_URLS = [
+  "/api/customers",
+  "/api/suppliers",
+  "/api/materials",
+  "/api/employees",
+  "/api/exchange-rates/latest",
+  "/api/sales",
+  "/api/purchases",
+  "/api/expenses",
+  "/api/incomes",
+  "/api/shareholders",
+  "/api/settings",
+];
+
+function PreWarmCache() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!user || !navigator.onLine) return;
+    // After login, pre-fetch all critical data into React Query cache
+    // (which in turn persists to IndexedDB via the persister)
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    for (const url of PREWARM_URLS) {
+      const fullUrl = `${base}${url}`;
+      qc.prefetchQuery({
+        queryKey: [url],
+        queryFn: () =>
+          fetch(fullUrl, { credentials: "include" })
+            .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+            .catch(() => null),
+        staleTime: STALE_TIME,
+      }).catch(() => {});
+    }
+  }, [user, qc]);
+
+  return null;
+}
 
 function PermissionRoute({
   path,
@@ -140,16 +200,24 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        maxAge: GC_TIME,
+        buster: "v1",
+      }}
+    >
       <TooltipProvider>
         <AuthProvider>
+          <PreWarmCache />
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
             <Router />
           </WouterRouter>
           <Toaster />
         </AuthProvider>
       </TooltipProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 
