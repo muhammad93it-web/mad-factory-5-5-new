@@ -100,7 +100,7 @@ const sections: Section[] = [
         pill: "bg-gradient-to-l from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white",
         chip: "bg-white/25 text-white",
         items: [
-          { label: "صندوق", href: "/cashbox", icon: Banknote },
+          { label: "مەوادەکان", href: "/materials", icon: Package },
           { label: "مەسروف", href: "/expenses", icon: Wallet },
           { label: "داهات", href: "/incomes", icon: PiggyBank },
           { label: "پارەهێنان (شریک)", href: "/shareholders", icon: ArrowDownToLine },
@@ -112,7 +112,7 @@ const sections: Section[] = [
         pill: "bg-gradient-to-l from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white",
         chip: "bg-white/25 text-white",
         items: [
-          { label: "مەوادەکان", href: "/materials", icon: Package },
+          { label: "صندوق", href: "/cashbox", icon: Banknote },
           { label: "موچە", href: "/payroll", icon: Calculator },
           { label: "کارمەندان", href: "/employees", icon: Users },
           { label: "ڕێکخستن", href: "/settings", icon: ShieldCheck },
