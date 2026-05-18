@@ -6,6 +6,7 @@ import {
   useDeleteSupplierPayment,
   useListSuppliers,
   useListPurchaseInvoices,
+  useListExchangeRates,
   getListSupplierPaymentsQueryKey,
   getListSuppliersQueryKey,
   getListPurchaseInvoicesQueryKey,
@@ -125,6 +126,21 @@ export default function SupplierPayments() {
     else if (mode === "new") setCodeInput("");
   }, [activeSupplierId, mode]);
 
+  const { data: allRates } = useListExchangeRates({}, { query: { queryKey: ["exchangeRates", "all"] } });
+
+  // Best rate for the current payment date (exact match → closest before → earliest)
+  const rateForDate = useMemo(() => {
+    if (!allRates?.length) return null;
+    const dateStr = draft.paymentDate.slice(0, 10);
+    const sorted = [...allRates].sort(
+      (a: { rateDate: string }, b: { rateDate: string }) => b.rateDate.localeCompare(a.rateDate),
+    );
+    const exact = sorted.find((r: { rateDate: string }) => r.rateDate === dateStr);
+    if (exact) return exact;
+    const before = sorted.find((r: { rateDate: string }) => r.rateDate <= dateStr);
+    return before ?? sorted[sorted.length - 1];
+  }, [allRates, draft.paymentDate]);
+
   const { data: purchaseInvoices } = useListPurchaseInvoices(
     { supplierId: activeSupplierId ?? 0 },
     {
@@ -191,6 +207,9 @@ export default function SupplierPayments() {
         supplierId: Number(draft.supplierId),
         amount: Number(draft.amount),
         currency: draft.currency,
+        exchangeRateId: draft.currency === "USD"
+          ? (rateForDate as { id?: number } | null)?.id
+          : undefined,
         paymentDate: draft.paymentDate,
         voucherType: draft.voucherType,
         notes: draft.notes || undefined,

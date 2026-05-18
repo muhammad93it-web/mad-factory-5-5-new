@@ -10,6 +10,7 @@ export const supplierPaymentsTable = pgTable("supplier_payments", {
   amount: numeric("amount", { precision: 15, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("IQD"),
   exchangeRateId: integer("exchange_rate_id").references(() => exchangeRatesTable.id, { onDelete: "set null" }),
+  exchangeRateValue: numeric("exchange_rate_value", { precision: 12, scale: 2 }),
   amountIqd: numeric("amount_iqd", { precision: 15, scale: 2 }).notNull(),
   paymentDate: text("payment_date").notNull(),
   // Voucher type: "cash" (وەصڵ پارە قبض — direct cash payment) | "internal" (وەرگرتن ناو وەصڵ — internal voucher)

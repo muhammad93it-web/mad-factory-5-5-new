@@ -12,7 +12,7 @@ import {
   useListSuppliers,
   useListMaterials,
   useListPurchaseInvoices,
-  useGetLatestExchangeRate,
+  useListExchangeRates,
   getListPurchaseInvoicesQueryKey,
   getListSuppliersQueryKey,
 } from "@workspace/api-client-react";
@@ -171,7 +171,20 @@ export default function PurchasesNew() {
   const { data: suppliers } = useListSuppliers({}, { query: { queryKey: getListSuppliersQueryKey() } });
   const { data: materials } = useListMaterials({ type: "buy" }, { query: { queryKey: ["materials", "buy"] } });
   const { data: allInvoices } = useListPurchaseInvoices({}, { query: { queryKey: getListPurchaseInvoicesQueryKey({}) } });
-  const { data: latestRate } = useGetLatestExchangeRate({ query: { queryKey: ["exchangeRate", "latest"] } });
+  const { data: allRates } = useListExchangeRates({}, { query: { queryKey: ["exchangeRates", "all"] } });
+
+  // Find the best-matching exchange rate for the current invoice date:
+  // 1. Exact match on date, 2. Most recent rate before the date, 3. Earliest available rate.
+  const rateForDate = useMemo(() => {
+    if (!allRates?.length) return null;
+    const sorted = [...allRates].sort((a: { rateDate: string }, b: { rateDate: string }) =>
+      b.rateDate.localeCompare(a.rateDate),
+    );
+    const exact = sorted.find((r: { rateDate: string }) => r.rateDate === invoiceDate);
+    if (exact) return exact;
+    const before = sorted.find((r: { rateDate: string }) => r.rateDate <= invoiceDate);
+    return before ?? sorted[sorted.length - 1];
+  }, [allRates, invoiceDate]);
 
   useEffect(() => {
     if (!supplierId) return;
@@ -246,7 +259,7 @@ export default function PurchasesNew() {
   const remaining = grandTotal - paidAmount;
   const totalQuantity = items.reduce((s, i) => s + (i.quantity ?? 0), 0);
 
-  const rate = latestRate ? Number(latestRate.rate) : 1480;
+  const rate = rateForDate ? Number((rateForDate as { rate: number }).rate) : 1480;
   const fmt = (v: number) => (currency === "IQD" ? formatMoney(v) : `${v.toLocaleString("en-US")} $`);
 
   const lastItem = items[items.length - 1];
@@ -313,7 +326,7 @@ export default function PurchasesNew() {
         supplierId: Number(supplierId),
         invoiceDate,
         currency,
-        exchangeRateId: latestRate?.id,
+        exchangeRateId: (rateForDate as { id?: number } | null)?.id,
         supplierMobile: supplierMobile || undefined,
         supplierAddress: supplierAddress || undefined,
         driver: driver || undefined,
@@ -491,8 +504,15 @@ export default function PurchasesNew() {
           </FieldRow>
 
           {currency === "USD" && (
-            <div className="text-[11px] text-slate-500 px-2" dir="ltr">
-              1 USD = {rate.toLocaleString("en-US")} IQD
+            <div className="text-[11px] px-2 flex items-center gap-2" dir="ltr">
+              <span className="text-slate-700 font-semibold">
+                1 USD = {rate.toLocaleString("en-US")} IQD
+              </span>
+              {rateForDate && (
+                <span className="text-slate-400">
+                  ({(rateForDate as { rateDate: string }).rateDate})
+                </span>
+              )}
             </div>
           )}
         </div>

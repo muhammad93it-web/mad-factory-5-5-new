@@ -16,6 +16,7 @@ function mapPayment(p: typeof supplierPaymentsTable.$inferSelect & { supplierNam
     supplierName: p.supplierName ?? "",
     amount: Number(p.amount),
     amountIqd: Number(p.amountIqd),
+    exchangeRateValue: p.exchangeRateValue != null ? Number(p.exchangeRateValue) : null,
     createdAt: p.createdAt.toISOString(),
   };
 }
@@ -47,15 +48,20 @@ router.post("/supplier-payments", async (req, res): Promise<void> => {
   }
 
   let amountIqd = parsed.data.amount;
+  let exchangeRateValue: number | null = null;
   if (parsed.data.currency === "USD" && parsed.data.exchangeRateId) {
     const [rate] = await db.select().from(exchangeRatesTable).where(eq(exchangeRatesTable.id, parsed.data.exchangeRateId));
-    if (rate) amountIqd = parsed.data.amount * Number(rate.rate);
+    if (rate) {
+      exchangeRateValue = Number(rate.rate);
+      amountIqd = parsed.data.amount * exchangeRateValue;
+    }
   }
 
   const [p] = await db.insert(supplierPaymentsTable).values({
     ...parsed.data,
     amount: String(parsed.data.amount),
     amountIqd: String(amountIqd),
+    exchangeRateValue: exchangeRateValue != null ? String(exchangeRateValue) : null,
   }).returning();
 
   const [supplier] = await db.select({ name: suppliersTable.name }).from(suppliersTable).where(eq(suppliersTable.id, parsed.data.supplierId));
