@@ -114,7 +114,7 @@ const sections: Section[] = [
         items: [
           { label: "مەوادەکان", href: "/materials", icon: Package },
           { label: "موچە", href: "/payroll", icon: Calculator },
-          { label: "بەرهەمبەران (کارمەند)", href: "/employees", icon: Users },
+          { label: "کارمەندان", href: "/employees", icon: Users },
           { label: "دەسەڵاتی ئەدمین", href: "/settings", icon: ShieldCheck },
           { label: "دەسەڵاتی بەکارهێنەر", href: "/settings", icon: UserCog },
         ],
